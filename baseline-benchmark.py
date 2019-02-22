@@ -201,10 +201,10 @@ def load_data(input_size, batch_size):
     print("Initializing Datasets and Dataloaders...")
 
     # Define datasets
-    train_dataset = torchvision.datasets.ImageFolder('./Datasets/Tobacco/all',
+    train_dataset = torchvision.datasets.ImageFolder('./Datasets/Tobacco/train',
                                                     transform=transform_train)
 
-    test_dataset = torchvision.datasets.ImageFolder('./Datasets/Tobacco/all',
+    test_dataset = torchvision.datasets.ImageFolder('./Datasets/Tobacco/test',
                                                     transform=transform_test)
 
     # Load N number of datasets in train dataset
