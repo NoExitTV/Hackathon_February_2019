@@ -201,10 +201,10 @@ def load_data(input_size, batch_size):
     print("Initializing Datasets and Dataloaders...")
 
     # Define datasets
-    train_dataset = torchvision.datasets.ImageFolder('./Tobacco/train/',
+    train_dataset = torchvision.datasets.ImageFolder('./Datasets/Tobacco/all',
                                                     transform=transform_train)
 
-    test_dataset = torchvision.datasets.ImageFolder('./Tobacco/test/',
+    test_dataset = torchvision.datasets.ImageFolder('./Datasets/Tobacco/all',
                                                     transform=transform_test)
 
     # Load N number of datasets in train dataset
@@ -230,11 +230,12 @@ def load_data(input_size, batch_size):
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-print("Running on device: ", device)
-print("torch.cuda.current_device()", torch.cuda.current_device())
-print("torch.cuda.device(0)", torch.cuda.device(0))
-print("torch.cuda.device_count()", torch.cuda.device_count())
-print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
+if torch.cuda.is_available():
+    print("Running on device: ", device)
+    print("torch.cuda.current_device()", torch.cuda.current_device())
+    print("torch.cuda.device(0)", torch.cuda.device(0))
+    print("torch.cuda.device_count()", torch.cuda.device_count())
+    print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 64 # Minibatch size
 num_epochs = 15
