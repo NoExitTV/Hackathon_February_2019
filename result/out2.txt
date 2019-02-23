@@ -1,0 +1,55 @@
+Hyperparameters
+batch_size = 16 # Minibatch size
+num_epochs = 30
+learning_rate = 0.5e-3
+
+    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
+                                            torchvision.transforms.RandomCrop(target_resolution)])
+
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+                                            transforms.RandomHorizontalFlip(),
+                                            torchvision.transforms.RandomRotation(20, resample=False, expand=False, center=None),
+                                            torchvision.transforms.RandomVerticalFlip(),
+                                            torchvision.transforms.ToTensor(),
+                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+No weights freezing
+
+Resnet18
+Accuracy of the network on the 2482 test images: 72 %
+Accuracy of  ADVE : 80 %
+Accuracy of Email : 94 %
+Accuracy of  Form : 79 %
+Accuracy of Letter : 71 %
+Accuracy of  Memo : 61 %
+Accuracy of  News : 96 %
+Accuracy of  Note : 69 %
+Accuracy of Report : 38 %
+Accuracy of Resume : 63 %
+Accuracy of Scientific : 46 %
+
+AlexNet
+Accuracy of the network on the 2482 test images: 70 %
+Accuracy of  ADVE : 90 %
+Accuracy of Email : 90 %
+Accuracy of  Form : 63 %
+Accuracy of Letter : 78 %
+Accuracy of  Memo : 59 %
+Accuracy of  News : 92 %
+Accuracy of  Note : 75 %
+Accuracy of Report : 39 %
+Accuracy of Resume : 63 %
+Accuracy of Scientific : 44 %
+
+VGG
+Accuracy of the network on the 2482 test images: 63 %
+Accuracy of  ADVE : 85 %
+Accuracy of Email : 84 %
+Accuracy of  Form : 80 %
+Accuracy of Letter : 66 %
+Accuracy of  Memo : 29 %
+Accuracy of  News : 86 %
+Accuracy of  Note : 75 %
+Accuracy of Report : 65 %
+Accuracy of Resume : 27 %
+Accuracy of Scientific : 26 %

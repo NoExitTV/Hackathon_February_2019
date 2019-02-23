@@ -270,7 +270,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 16 # Minibatch size
-num_epochs = 30
+num_epochs = 50
 learning_rate = 0.5e-3
 num_classes = 10
 
@@ -278,8 +278,8 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["resnet", "alexnet", "vgg"]
-#models_list = ["resnet"]
+#models_list = ["resnet", "alexnet", "vgg"]
+models_list = ["resnet"]
 results = []
 
 train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
