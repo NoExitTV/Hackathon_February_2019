@@ -13,7 +13,7 @@ import time
 import os
 import copy
 from alexnet import AlexNet
-from vgg import VGG
+from vgg import VGG, vgg13
 
 print("PyTorch Version: ",torch.__version__)
 print("Torchvision Version: ",torchvision.__version__)
@@ -144,7 +144,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     elif model_name == "vgg":
         """ Pretrained vgg
         """
-        model_ft = VGG.vgg13()
+        model_ft = vgg13()
         checkpoint = torch.load('./pretrained-models/vgg/model_best.pth.tar')
         state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
                     'state_dict'].items()}
