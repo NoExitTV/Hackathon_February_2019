@@ -206,11 +206,11 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     return model_ft, input_size
 
 def load_data(input_size, batch_size):
-    target_resolution = (480, 640)
+    target_resolution = (240, 320)
 
     print("Initializing Datasets and Dataloaders...")
 
-    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
+    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((360, 480)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
 
     transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
@@ -228,10 +228,10 @@ def load_data(input_size, batch_size):
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
-    tobacco_train = datasets.ImageFolder("datasets/Tobacco_aug/train",
+    tobacco_train = datasets.ImageFolder("datasets/Tobacco/train",
                                         transform=transform_train)
 
-    tobacco_val = datasets.ImageFolder("datasets/Tobacco_aug/val",
+    tobacco_val = datasets.ImageFolder("datasets/Tobacco/val",
                                         transform=transform_val)
 
     tobacco_test = datasets.ImageFolder("datasets/Tobacco/test",
