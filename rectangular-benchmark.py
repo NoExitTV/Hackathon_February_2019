@@ -110,73 +110,44 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     model_ft = None
     input_size = 0
 
-    if model_name == "resnet18":
-        """ Resnet18
+    if model_name == "resnet":
+        """ Pretrained resnet
         """
-        model_ft = models.resnet18(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs, num_classes)
-        input_size = 224
-
-    elif model_name == "resnet50":
-        """ Resnet18
-        """
-        model_ft = models.resnet50(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs, num_classes)
-        input_size = 224
+        model_ft = models.resnet18(pretrained=False)
+        checkpoint = torch.load('./pretrained-models/resnet/model_best.pth.tar')
+        state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
+                    'state_dict'].items()}
+        model_ft.load_state_dict(state_dict)
+        model_ft.eval()
+        # set_parameter_requires_grad(model_ft, feature_extract)
+        # num_ftrs = model_ft.fc.in_features
+        model_ft.fc = nn.Linear(4096, num_classes)
 
     elif model_name == "alexnet":
-        """ Alexnet
+        """ Pretrained alexnet
         """
-        model_ft = models.alexnet(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
-        input_size = 224
+        model_ft = models.alexnet(pretrained=False)
+        checkpoint = torch.load('./pretrained-models/alexnet/model_best.pth.tar')
+        state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
+                    'state_dict'].items()}
+        model_ft.load_state_dict(state_dict)
+        model_ft.eval()
+        # set_parameter_requires_grad(model_ft, feature_extract)
+        # num_ftrs = model_ft.fc.in_features
+        model_ft.fc = nn.Linear(4096, num_classes)
 
     elif model_name == "vgg":
-        """ VGG11_bn
+        """ Pretrained vgg
         """
-        model_ft = models.vgg11_bn(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
-        input_size = 224
-
-    elif model_name == "squeezenet":
-        """ Squeezenet
-        """
-        model_ft = models.squeezenet1_0(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        model_ft.classifier[1] = nn.Conv2d(512, num_classes, kernel_size=(1,1), stride=(1,1))
-        model_ft.num_classes = num_classes
-        input_size = 224
-
-    elif model_name == "densenet":
-        """ Densenet
-        """
-        model_ft = models.densenet121(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.classifier.in_features
-        model_ft.classifier = nn.Linear(num_ftrs, num_classes)
-        input_size = 224
-
-    elif model_name == "inception":
-        """ Inception v3
-        Be careful, expects (299,299) sized images and has auxiliary output
-        """
-        model_ft = models.inception_v3(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        # Handle the auxilary net
-        num_ftrs = model_ft.AuxLogits.fc.in_features
-        model_ft.AuxLogits.fc = nn.Linear(num_ftrs, num_classes)
-        # Handle the primary net
-        num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs,num_classes)
-        input_size = 299
+        model_ft = models.vgg13(pretrained=False)
+        checkpoint = torch.load('./pretrained-models/vgg/model_best.pth.tar')
+        state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
+                    'state_dict'].items()}
+        model_ft.load_state_dict(state_dict)
+        model_ft.eval()
+        # set_parameter_requires_grad(model_ft, feature_extract)
+        # num_ftrs = model_ft.classifier[6].in_features
+        model_ft.classifier[6] = nn.Linear(4096, num_classes)
 
     else:
         print("Invalid model name, exiting...")
@@ -188,23 +159,23 @@ def load_data(input_size, batch_size):
 
     # Define transform that we do on datasets
     # Removed torchvision.transforms.Grayscale(num_output_channels=1)
-    transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize((input_size,input_size)),
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize((240,320)),
                                             transforms.RandomHorizontalFlip(),
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     # We don't do a random horizontal flip on the test data!
-    transform_test = torchvision.transforms.Compose([torchvision.transforms.Resize((input_size,input_size)),
+    transform_test = torchvision.transforms.Compose([torchvision.transforms.Resize((240,320)),
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     print("Initializing Datasets and Dataloaders...")
 
     # Define datasets
-    train_dataset = torchvision.datasets.ImageFolder('./Datasets/Tobacco/train',
+    train_dataset = torchvision.datasets.ImageFolder('./datasets/Tobacco/train',
                                                     transform=transform_train)
 
-    test_dataset = torchvision.datasets.ImageFolder('./Datasets/Tobacco/test',
+    test_dataset = torchvision.datasets.ImageFolder('./datasets/Tobacco/test',
                                                     transform=transform_test)
 
     # Load N number of datasets in train dataset
@@ -246,7 +217,7 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["resnet50", "resnet18"]
+models_list = ["resnet", "alexnet", "vgg"]
 results = []
 
 for model_name in models_list:
@@ -291,6 +262,8 @@ for model_name in models_list:
     criterion = nn.CrossEntropyLoss()
 
     dataloaders_dict = {"train": train_loader, "test": test_loader}
+
+    print(model_ft)
 
     # Train and evaluate
     model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
