@@ -119,9 +119,6 @@ def test_model(model, dataloaders, classes):
 
     for inputs, labels in dataloaders['test']:
             
-            print(inputs.shape)
-            print(labels.shape)
-            
             inputs = inputs.to(device)
             labels = labels.to(device)
 
@@ -323,10 +320,10 @@ for model_name in models_list:
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
     # Train and evaluate
-    #model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
+    model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
 
     # Save model
-    #torch.save(model_ft.state_dict(), "./saved-models/"+model_name)
+    torch.save(model_ft.state_dict(), "./saved-models/"+model_name)
 
     # Test
     correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
