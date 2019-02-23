@@ -133,7 +133,7 @@ def test_model(model, dataloaders, classes):
                 # Accuracy per class
                 c = (preds == labels).squeeze()
                 for i in range(10):
-                    if i < len(label):
+                    if i < len(labels):
                         label = labels[i]
                         class_correct[label] += c[i].item()
                         class_total[label] += 1
