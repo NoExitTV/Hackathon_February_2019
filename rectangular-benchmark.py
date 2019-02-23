@@ -213,8 +213,8 @@ def load_data(input_size, batch_size):
                                             torchvision.transforms.RandomCrop(target_resolution)])
 
     transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
-                                            torchvision.transforms.RandomRotation(20, resample=False, expand=False, center=None),
                                             transforms.RandomHorizontalFlip(),
+                                            torchvision.transforms.RandomRotation(20, resample=False, expand=False, center=None),
                                             torchvision.transforms.RandomVerticalFlip(),
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
