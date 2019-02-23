@@ -213,12 +213,17 @@ def load_data(input_size, batch_size):
     resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((360, 480)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
 
-    transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
                                             transforms.RandomHorizontalFlip(),
-                                            torchvision.transforms.RandomRotation(20, resample=False, expand=False, center=None),
-                                            torchvision.transforms.RandomVerticalFlip(),
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+    #transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+    #                                        transforms.RandomHorizontalFlip(),
+    #                                        torchvision.transforms.RandomRotation(20, resample=False, expand=False, center=None),
+    #                                        torchvision.transforms.RandomVerticalFlip(),
+    #                                        torchvision.transforms.ToTensor(),
+    #                                        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     transform_val = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
                                             torchvision.transforms.ToTensor(),
@@ -228,10 +233,10 @@ def load_data(input_size, batch_size):
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
-    tobacco_train = datasets.ImageFolder("datasets/Tobacco/train",
+    tobacco_train = datasets.ImageFolder("datasets/Tobacco_aug/train",
                                         transform=transform_train)
 
-    tobacco_val = datasets.ImageFolder("datasets/Tobacco/val",
+    tobacco_val = datasets.ImageFolder("datasets/Tobacco_aug/val",
                                         transform=transform_val)
 
     tobacco_test = datasets.ImageFolder("datasets/Tobacco/test",
@@ -269,7 +274,7 @@ if torch.cuda.is_available():
     print("torch.cuda.device_count()", torch.cuda.device_count())
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
-batch_size = 16 # Minibatch size
+batch_size = 32 # Minibatch size
 num_epochs = 50
 learning_rate = 0.5e-3
 num_classes = 10
