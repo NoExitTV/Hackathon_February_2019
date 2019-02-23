@@ -102,6 +102,53 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
     model.load_state_dict(best_model_wts)
     return model, val_acc_history
 
+def test_model(model, dataloaders):
+    
+    print("Testing on device: ", device)
+
+    since = time.time()
+
+     # Vars for total accuracy
+    correct = 0
+    total = 0
+    # Vars for accuracy per class
+    class_correct = list(0. for i in range(10))
+    class_total = list(0. for i in range(10))
+
+    for inputs, labels in dataloaders['test']:
+            
+            print(inputs.shape)
+            print(labels.shape)
+            
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+
+            _, preds = torch.max(outputs, 1)
+
+            # Overall accuracy
+            total += labels.size(0)
+            correct += (preds == labels).sum().item()
+
+            # Accuracy per class
+            c = (preds == labels).squeeze()
+            for i in range(10):
+                label = labels[i]
+                class_correct[label] += c[i].item()
+                class_total[label] += 1
+
+    time_elapsed = time.time() - since
+    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    
+    print('Accuracy of the network on the test images: %d %%' % (100 * correct / total))
+        
+    for i in range(10):
+        print('Accuracy of %5s : %2d %%' % (i, 100 * class_correct[i] / class_total[i]))        
+    
+    return correct, total, class_correct, class_total
+
 def set_parameter_requires_grad(model, feature_extracting):
     if feature_extracting:
         for param in model.parameters():
@@ -227,7 +274,7 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["vgg", "resnet", "alexnet"]
+models_list = ["resnet", "vgg", "alexnet"]
 results = []
 
 for model_name in models_list:
@@ -276,10 +323,13 @@ for model_name in models_list:
     print(model_ft)
 
     # Train and evaluate
-    model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
+    #model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
 
     # Save model
-    torch.save(model_ft.state_dict(), "./saved-models/"+model_name)
+    #torch.save(model_ft.state_dict(), "./saved-models/"+model_name)
+
+    # Test
+    correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict)
 
     # Add model results
     results.append({'model_name': model_name, 'hist': hist})
