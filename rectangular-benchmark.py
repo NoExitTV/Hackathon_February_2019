@@ -35,7 +35,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
         print('-' * 10)
 
         # Each epoch has a training and validation phase
-        for phase in ['train', 'test']:
+        for phase in ['train', 'val']:
             if phase == 'train':
                 model.train()  # Set model to training mode
             else:
@@ -86,7 +86,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
             # deep copy the model
-            if phase == 'test' and epoch_acc > best_acc:
+            if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
             if phase == 'test':
@@ -172,7 +172,7 @@ def load_data(input_size, batch_size):
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
-    transform_test = torchvision.transforms.Compose([torchvision.transforms.Resize((input_size,input_size)),
+    transform_test = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
@@ -287,7 +287,7 @@ for model_name in models_list:
 #%%
 ########## Plot some stuff ##########
 
-plt.title("Test Accuracy vs. Number of Training Epochs")
+plt.title("Validation Accuracy vs. Number of Training Epochs")
 plt.xlabel("Training Epochs")
 plt.ylabel("Validation Accuracy")
 
