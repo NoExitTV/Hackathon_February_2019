@@ -104,7 +104,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
     model.load_state_dict(best_model_wts)
     return model, val_acc_history
 
-def test_model(model, dataloaders):
+def test_model(model, dataloaders, classes):
     
     print("Testing on device: ", device)
 
@@ -142,12 +142,12 @@ def test_model(model, dataloaders):
                 class_total[label] += 1
 
     time_elapsed = time.time() - since
-    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     
-    print('Accuracy of the network on the test images: %d %%' % (100 * correct / total))
+    print('Accuracy of the network on the ' + str(total) + ' test images: %d %%' % (100 * correct / total))
         
     for i in range(10):
-        print('Accuracy of %5s : %2d %%' % (i, 100 * class_correct[i] / class_total[i]))        
+        print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))        
     
     return correct, total, class_correct, class_total
 
@@ -249,8 +249,8 @@ def load_data(input_size, batch_size):
     test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
                                             batch_size=batch_size,
                                             shuffle=False)
-    
-    return train_loader, val_loader, test_loader
+
+    return train_loader, val_loader, test_loader, train_dataset.classes
     
 
 
@@ -291,7 +291,7 @@ for model_name in models_list:
     # Print the model we just instantiated
     print(model_ft)
 
-    train_loader, val_loader, test_loader = load_data(input_size, batch_size)
+    train_loader, val_loader, test_loader, classes = load_data(input_size, batch_size)
 
     # Send the model to device (hopefully GPU :))
     model_ft = model_ft.to(device)
@@ -329,7 +329,7 @@ for model_name in models_list:
     #torch.save(model_ft.state_dict(), "./saved-models/"+model_name)
 
     # Test
-    correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict)
+    correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
 
     # Add model results
     results.append({'model_name': model_name, 'hist': hist})
