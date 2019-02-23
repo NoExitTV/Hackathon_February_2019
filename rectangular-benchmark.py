@@ -105,48 +105,47 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
     return model, val_acc_history
 
 def test_model(model, dataloaders, classes):
-    
     print("Testing on device: ", device)
+    with torch.no_grad():
+        since = time.time()
 
-    since = time.time()
+        # Vars for total accuracy
+        correct = 0
+        total = 0
+        # Vars for accuracy per class
+        class_correct = list(0. for i in range(10))
+        class_total = list(0. for i in range(10))
 
-     # Vars for total accuracy
-    correct = 0
-    total = 0
-    # Vars for accuracy per class
-    class_correct = list(0. for i in range(10))
-    class_total = list(0. for i in range(10))
+        for inputs, labels in dataloaders['test']:
+                
+                inputs = inputs.to(device)
+                labels = labels.to(device)
 
-    for inputs, labels in dataloaders['test']:
-            
-            inputs = inputs.to(device)
-            labels = labels.to(device)
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
 
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
+                _, preds = torch.max(outputs, 1)
 
-            _, preds = torch.max(outputs, 1)
+                # Overall accuracy
+                total += labels.size(0)
+                correct += (preds == labels).sum().item()
 
-            # Overall accuracy
-            total += labels.size(0)
-            correct += (preds == labels).sum().item()
+                # Accuracy per class
+                c = (preds == labels).squeeze()
+                for i in range(10):
+                    label = labels[i]
+                    class_correct[label] += c[i].item()
+                    class_total[label] += 1
 
-            # Accuracy per class
-            c = (preds == labels).squeeze()
-            for i in range(10):
-                label = labels[i]
-                class_correct[label] += c[i].item()
-                class_total[label] += 1
-
-    time_elapsed = time.time() - since
-    print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-    
-    print('Accuracy of the network on the ' + str(total) + ' test images: %d %%' % (100 * correct / total))
+        time_elapsed = time.time() - since
+        print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
         
-    for i in range(10):
-       print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))        
-    
-    return correct, total, class_correct, class_total
+        print('Accuracy of the network on the ' + str(total) + ' test images: %d %%' % (100 * correct / total))
+            
+        for i in range(10):
+            print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))        
+        
+        return correct, total, class_correct, class_total
 
 def set_parameter_requires_grad(model, feature_extracting):
     if feature_extracting:
@@ -269,7 +268,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 16 # Minibatch size
-num_epochs = 25
+num_epochs = 0
 learning_rate = 0.5e-3
 num_classes = 10
 

@@ -1,0 +1,47 @@
+Hyperparameters:
+Epochs 50
+Learning rate 1e-3
+Minibatch 24
+No freezing
+No special transformation
+No early stop
+
+
+Alexnet
+Accuracy of the network on the 2482 test images: 62 %
+Accuracy of  ADVE : 91 %
+Accuracy of Email : 82 %
+Accuracy of  Form : 71 %
+Accuracy of Letter : 78 %
+Accuracy of  Memo : 24 %
+Accuracy of  News : 75 %
+Accuracy of  Note : 47 %
+Accuracy of Report : 61 %
+Accuracy of Resume : 50 %
+Accuracy of Scientific : 27 %
+
+VGG13
+Accuracy of the network on the 2482 test images: 22 %
+Accuracy of  ADVE : 98 %
+Accuracy of Email : 85 %
+Accuracy of  Form :  0 %
+Accuracy of Letter :  0 %
+Accuracy of  Memo :  0 %
+Accuracy of  News :  0 %
+Accuracy of  Note :  0 %
+Accuracy of Report :  0 %
+Accuracy of Resume :  0 %
+Accuracy of Scientific :  0 %
+
+ResNet18
+Accuracy of the network on the 2482 test images: 77 %
+Accuracy of  ADVE : 90 %
+Accuracy of Email : 89 %
+Accuracy of  Form : 80 %
+Accuracy of Letter : 78 %
+Accuracy of  Memo : 71 %
+Accuracy of  News : 91 %
+Accuracy of  Note : 77 %
+Accuracy of Report : 57 %
+Accuracy of Resume : 80 %
+Accuracy of Scientific : 41 %
