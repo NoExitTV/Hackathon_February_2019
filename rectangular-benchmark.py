@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import time
 import os
 import copy
+from alexnet import AlexNet
+from vgg import VGG, vgg13
 
 print("PyTorch Version: ",torch.__version__)
 print("Torchvision Version: ",torchvision.__version__)
@@ -102,6 +104,50 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
     model.load_state_dict(best_model_wts)
     return model, val_acc_history
 
+def test_model(model, dataloaders, classes):
+    
+    print("Testing on device: ", device)
+
+    since = time.time()
+
+     # Vars for total accuracy
+    correct = 0
+    total = 0
+    # Vars for accuracy per class
+    class_correct = list(0. for i in range(10))
+    class_total = list(0. for i in range(10))
+
+    for inputs, labels in dataloaders['test']:
+            
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+
+            _, preds = torch.max(outputs, 1)
+
+            # Overall accuracy
+            total += labels.size(0)
+            correct += (preds == labels).sum().item()
+
+            # Accuracy per class
+            c = (preds == labels).squeeze()
+            for i in range(10):
+                label = labels[i]
+                class_correct[label] += c[i].item()
+                class_total[label] += 1
+
+    time_elapsed = time.time() - since
+    print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    
+    #print('Accuracy of the network on the ' + str(total) + ' test images: %d %%' % (100 * correct / total))
+        
+    #for i in range(10):
+    #    print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))        
+    
+    return correct, total, class_correct, class_total
+
 def set_parameter_requires_grad(model, feature_extracting):
     if feature_extracting:
         for param in model.parameters():
@@ -122,36 +168,35 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
-        # set_parameter_requires_grad(model_ft, feature_extract)
+        set_parameter_requires_grad(model_ft, feature_extract)
         # num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(4096, num_classes)
 
     elif model_name == "alexnet":
         """ Pretrained alexnet
         """
-        model_ft = models.alexnet(pretrained=False)
+        model_ft = AlexNet()
         checkpoint = torch.load('./pretrained-models/alexnet/model_best.pth.tar')
         state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
-        # set_parameter_requires_grad(model_ft, feature_extract)
-        # num_ftrs = model_ft.fc.in_features
-        model_ft.classifier[1] = nn.Linear(9216, 4096)
-        model_ft.classifier[6] = nn.Linear(4096, num_classes)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.classifier[6].in_features
+        model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
     elif model_name == "vgg":
         """ Pretrained vgg
         """
-        model_ft = models.vgg13(pretrained=False)
+        model_ft = vgg13()
         checkpoint = torch.load('./pretrained-models/vgg/model_best.pth.tar')
         state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
-        # set_parameter_requires_grad(model_ft, feature_extract)
-        # num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(4096, num_classes)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.classifier[6].in_features
+        model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
     else:
         print("Invalid model name, exiting...")
@@ -206,8 +251,8 @@ def load_data(input_size, batch_size):
     test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
                                             batch_size=batch_size,
                                             shuffle=False)
-    
-    return train_loader, val_loader, test_loader
+
+    return train_loader, val_loader, test_loader, tobacco_train.classes
     
 
 
@@ -223,7 +268,7 @@ if torch.cuda.is_available():
     print("torch.cuda.device_count()", torch.cuda.device_count())
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
-batch_size = 64 # Minibatch size
+batch_size = 24 # Minibatch size
 num_epochs = 2
 learning_rate = 0.5e-3
 num_classes = 10
@@ -232,22 +277,24 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["vgg", "resnet", "alexnet"]
+models_list = ["alexnet", "vgg", "resnet"]
+#models_list = ["resnet"]
 results = []
+
+train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
+dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
 for model_name in models_list:
 
     # Flag for feature extracting. When False, we finetune the whole model,
     #   when True we only update the reshaped layer params
-    feature_extract = True
+    feature_extract = False
 
     # Initialize the model for this run
     model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
 
     # Print the model we just instantiated
     print(model_ft)
-
-    train_loader, val_loader, test_loader = load_data(input_size, batch_size)
 
     # Send the model to device (hopefully GPU :))
     model_ft = model_ft.to(device)
@@ -276,23 +323,36 @@ for model_name in models_list:
     # Setup the loss fxn
     criterion = nn.CrossEntropyLoss()
 
-    dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
-
-    print(model_ft)
-
     # Train and evaluate
     model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
 
     # Save model
     torch.save(model_ft.state_dict(), "./saved-models/"+model_name)
 
+    # Test
+    correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
+
     # Add model results
-    results.append({'model_name': model_name, 'hist': hist})
+    results.append({'model_name': model_name, 
+                    'hist': hist, 
+                    'correct': correct,
+                    'total': total,
+                    'class_correct': class_correct,
+                    'class_total': class_total,
+                    'classes': classes})
 
+    del model_ft
+    torch.cuda.empty_cache()
 
+for m in results:
+    print('Accuracy of the network on the ' + str(m['total']) + ' test images: %d %%' % (100 * m['correct'] / m['total']))
+        
+    for i in range(10):
+        print('Accuracy of %5s : %2d %%' % (m['classes'][i], 100 * m['class_correct'][i] / m['class_total'][i]))        
+    
 #%%
 ########## Plot some stuff ##########
-
+'''
 plt.title("Validation Accuracy vs. Number of Training Epochs")
 plt.xlabel("Training Epochs")
 plt.ylabel("Validation Accuracy")
@@ -308,6 +368,6 @@ plt.ylim((0,1.))
 plt.xticks(np.arange(1, num_epochs+1, 1.0))
 plt.legend()
 plt.show()
-
+'''
 
     
