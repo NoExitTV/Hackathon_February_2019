@@ -117,7 +117,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         """ Pretrained resnet
         """
         model_ft = models.resnet18(pretrained=False)
-        checkpoint = torch.load('./pretrained-models/resnet/model_best.pth.tar', map_location="cpu")
+        checkpoint = torch.load('./pretrained-models/resnet/model_best.pth.tar')
         state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
@@ -159,7 +159,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     return model_ft, input_size
 
 def load_data(input_size, batch_size):
-    target_resolution = (224, 224)
+    target_resolution = (240, 320)
 
     print("Initializing Datasets and Dataloaders...")
 
