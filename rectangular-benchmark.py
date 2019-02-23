@@ -137,7 +137,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         model_ft.eval()
         # set_parameter_requires_grad(model_ft, feature_extract)
         # num_ftrs = model_ft.fc.in_features
-        model_ft.classifier[1] = nn.Linear(13824, 4096)
+        model_ft.classifier[1] = nn.Linear(9216, 4096)
         model_ft.classifier[6] = nn.Linear(4096, num_classes)
 
     elif model_name == "vgg":
