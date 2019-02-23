@@ -1,0 +1,39 @@
+Hyperparameters:
+batch_size = 32 # Minibatch size
+num_epochs = 50
+learning_rate = 0.5e-3
+num_classes = 10
+
+no freezing
+no torchvision transformation
+
+AUGMENTED DATASET
+target_resolution = (240, 320)
+
+
+Training complete in 50m 23s                            
+Best val Acc: 0.663000                                  
+Testing on device:  cuda:0                              
+Testing complete in 1m 49s                              
+Accuracy of the network on the 2482 test images: 69 %   
+Accuracy of  ADVE : 85 %                                
+Accuracy of Email : 84 %                                
+Accuracy of  Form : 73 %                                
+Accuracy of Letter : 59 %                               
+Accuracy of  Memo : 74 %                                
+Accuracy of  News : 93 %                                
+Accuracy of  Note : 70 %                                
+Accuracy of Report : 48 %                               
+Accuracy of Resume : 60 %                               
+Accuracy of Scientific : 52 %                           
+Accuracy of the network on the 2482 test images: 69 %   
+Accuracy of  ADVE : 85 %                                
+Accuracy of Email : 84 %                                
+Accuracy of  Form : 73 %                                
+Accuracy of Letter : 59 %                               
+Accuracy of  Memo : 74 %                                
+Accuracy of  News : 93 %                                
+Accuracy of  Note : 70 %                                
+Accuracy of Report : 48 %                               
+Accuracy of Resume : 60 %                               
+Accuracy of Scientific : 52 %                           
