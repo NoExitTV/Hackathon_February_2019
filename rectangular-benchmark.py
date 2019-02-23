@@ -141,10 +141,10 @@ def test_model(model, dataloaders, classes):
     time_elapsed = time.time() - since
     print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     
-    print('Accuracy of the network on the ' + str(total) + ' test images: %d %%' % (100 * correct / total))
+    #print('Accuracy of the network on the ' + str(total) + ' test images: %d %%' % (100 * correct / total))
         
-    for i in range(10):
-        print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))        
+    #for i in range(10):
+    #    print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))        
     
     return correct, total, class_correct, class_total
 
@@ -168,7 +168,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
-        set_parameter_requires_grad(model_ft, feature_extract)
+        #set_parameter_requires_grad(model_ft, feature_extract)
         # num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(4096, num_classes)
 
@@ -181,7 +181,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
-        set_parameter_requires_grad(model_ft, feature_extract)
+        #set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
@@ -194,7 +194,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
-        set_parameter_requires_grad(model_ft, feature_extract)
+        #set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
@@ -264,7 +264,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 64 # Minibatch size
-num_epochs = 50
+num_epochs = 1
 learning_rate = 1e-3
 num_classes = 10
 
@@ -329,9 +329,21 @@ for model_name in models_list:
     correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
 
     # Add model results
-    results.append({'model_name': model_name, 'hist': hist})
+    results.append({'model_name': model_name, 
+                    'hist': hist, 
+                    'correct': correct,
+                    'total': total,
+                    'class_correct': class_correct,
+                    'class_total': class_total,
+                    'classes': classes})
 
 
+for m in r:
+    print('Accuracy of the network on the ' + str(m.total) + ' test images: %d %%' % (100 * m.correct / m.total))
+        
+    for i in range(10):
+        print('Accuracy of %5s : %2d %%' % (m.classes[i], 100 * m.class_correct[i] / m.class_total[i]))        
+    
 #%%
 ########## Plot some stuff ##########
 '''
