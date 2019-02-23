@@ -227,7 +227,7 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["vgg", "resnet", "alexnet"]
+models_list = ["alexnet", "vgg", "resnet"]
 results = []
 
 for model_name in models_list:
