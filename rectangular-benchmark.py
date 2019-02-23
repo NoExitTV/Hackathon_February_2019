@@ -220,7 +220,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 64 # Minibatch size
-num_epochs = 2
+num_epochs = 15
 learning_rate = 1e-3
 num_classes = 10
 
@@ -228,7 +228,8 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["alexnet", "vgg", "resnet"]
+#models_list = ["alexnet", "vgg", "resnet"]
+models_list = ["resnet"]
 results = []
 
 for model_name in models_list:
@@ -274,13 +275,11 @@ for model_name in models_list:
 
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
-    print(model_ft)
-
     # Train and evaluate
     model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
 
     # Save model
-    torch.save(model_ft.state_dict(), "./saved-models/"+model_name)
+    torch.save(model_ft.state_dict(), "./saved-models/"+model_name+".h5")
 
     # Add model results
     results.append({'model_name': model_name, 'hist': hist})
@@ -288,7 +287,7 @@ for model_name in models_list:
 
 #%%
 ########## Plot some stuff ##########
-
+'''
 plt.title("Validation Accuracy vs. Number of Training Epochs")
 plt.xlabel("Training Epochs")
 plt.ylabel("Validation Accuracy")
@@ -304,6 +303,6 @@ plt.ylim((0,1.))
 plt.xticks(np.arange(1, num_epochs+1, 1.0))
 plt.legend()
 plt.show()
-
+'''
 
     
