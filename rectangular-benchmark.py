@@ -117,7 +117,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         """ Pretrained resnet
         """
         model_ft = models.resnet18(pretrained=False)
-        checkpoint = torch.load('./pretrained-models/resnet/model_best.pth.tar')
+        checkpoint = torch.load('./pretrained-models/resnet/model_best.pth.tar', map_location="cpu")
         state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
