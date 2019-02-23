@@ -1,0 +1,30 @@
+Hyperparameters:
+batch_size = 16 # Minibatch size
+num_epochs = 50
+learning_rate = 0.5e-3
+num_classes = 10
+
+resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
+                                            torchvision.transforms.RandomCrop(target_resolution)])
+
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+                                            transforms.RandomHorizontalFlip(),
+                                            torchvision.transforms.RandomRotation(20, resample=False, expand=False, center=None),
+                                            torchvision.transforms.RandomVerticalFlip(),
+                                            torchvision.transforms.ToTensor(),
+                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+
+no freeze
+
+Accuracy of the network on the 2482 test images: 77 %
+Accuracy of  ADVE : 92 %
+Accuracy of Email : 93 %
+Accuracy of  Form : 82 %
+Accuracy of Letter : 76 %
+Accuracy of  Memo : 77 %
+Accuracy of  News : 94 %
+Accuracy of  Note : 73 %
+Accuracy of Report : 50 %
+Accuracy of Resume : 63 %
+Accuracy of Scientific : 32 %
