@@ -264,7 +264,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 64 # Minibatch size
-num_epochs = 15
+num_epochs = 50
 learning_rate = 1e-3
 num_classes = 10
 
@@ -272,8 +272,8 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-#models_list = ["alexnet", "vgg", "resnet"]
-models_list = ["resnet"]
+models_list = ["alexnet", "vgg", "resnet"]
+#models_list = ["resnet"]
 results = []
 
 for model_name in models_list:
