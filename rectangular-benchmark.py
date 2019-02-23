@@ -133,13 +133,11 @@ def test_model(model, dataloaders, classes):
                 # Accuracy per class
                 c = (preds == labels).squeeze()
                 for i in range(10):
-                    try:
+                    if i < len(label):
                         label = labels[i]
-                    except:
-                        print(labels)
-                        print(labels.shape)
-                    class_correct[label] += c[i].item()
-                    class_total[label] += 1
+                        class_correct[label] += c[i].item()
+                        class_total[label] += 1
+                    
 
         time_elapsed = time.time() - since
         print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
