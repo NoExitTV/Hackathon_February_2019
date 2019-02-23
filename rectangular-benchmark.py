@@ -337,8 +337,12 @@ for model_name in models_list:
                     'class_total': class_total,
                     'classes': classes})
 
+    del model_ft
+    del dataloaders_dict
+    del train_loader, val_loader, test_loader
+    torch.cuda.empty_cache()
 
-for m in r:
+for m in results:
     print('Accuracy of the network on the ' + str(m.total) + ' test images: %d %%' % (100 * m.correct / m.total))
         
     for i in range(10):
