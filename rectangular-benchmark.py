@@ -168,7 +168,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
-        # set_parameter_requires_grad(model_ft, feature_extract)
+        set_parameter_requires_grad(model_ft, feature_extract)
         # num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(4096, num_classes)
 
@@ -181,7 +181,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
-        # set_parameter_requires_grad(model_ft, feature_extract)
+        set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
@@ -194,7 +194,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
-        # set_parameter_requires_grad(model_ft, feature_extract)
+        set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
