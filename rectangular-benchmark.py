@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import time
 import os
 import copy
+from alexnet import AlexNet
 
 print("PyTorch Version: ",torch.__version__)
 print("Torchvision Version: ",torchvision.__version__)
@@ -129,15 +130,15 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     elif model_name == "alexnet":
         """ Pretrained alexnet
         """
-        model_ft = models.alexnet(pretrained=False)
+        model_ft = AlexNet()
         checkpoint = torch.load('./pretrained-models/alexnet/model_best.pth.tar')
         state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
         # set_parameter_requires_grad(model_ft, feature_extract)
-        # num_ftrs = model_ft.fc.in_features
-        model_ft.classifier[6] = nn.Linear(4096, num_classes)
+        num_ftrs = model_ft.classifier[6].in_features
+        model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
     elif model_name == "vgg":
         """ Pretrained vgg
@@ -149,8 +150,8 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
         # set_parameter_requires_grad(model_ft, feature_extract)
-        # num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(4096, num_classes)
+        num_ftrs = model_ft.classifier[6].in_features
+        model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
     else:
         print("Invalid model name, exiting...")
