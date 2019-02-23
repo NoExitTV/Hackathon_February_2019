@@ -160,15 +160,20 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     return model_ft, input_size
 
 def load_data(input_size, batch_size):
-    target_resolution = (240, 320)
+    target_resolution = (480, 640)
 
     print("Initializing Datasets and Dataloaders...")
 
-    transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
+    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
+                                            torchvision.transforms.RandomCrop(target_resolution)])
+
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+                                            torchvision.transforms.RandomRotation(20, resample=False, expand=False, center=None),
                                             transforms.RandomHorizontalFlip(),
+                                            torchvision.transforms.RandomVerticalFlip(),
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-    
+
     transform_val = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -220,7 +225,7 @@ if torch.cuda.is_available():
 
 batch_size = 64 # Minibatch size
 num_epochs = 2
-learning_rate = 1e-3
+learning_rate = 0.5e-3
 num_classes = 10
 
 
