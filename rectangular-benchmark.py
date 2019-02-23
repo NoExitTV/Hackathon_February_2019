@@ -277,7 +277,7 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["alexnet", "vgg", "resnet"]
+models_list = ["resnet", "alexnet", "vgg"]
 #models_list = ["resnet"]
 results = []
 
