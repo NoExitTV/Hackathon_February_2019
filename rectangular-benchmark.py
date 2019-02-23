@@ -276,6 +276,9 @@ models_list = ["alexnet", "vgg", "resnet"]
 #models_list = ["resnet"]
 results = []
 
+train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
+dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
+
 for model_name in models_list:
 
     # Flag for feature extracting. When False, we finetune the whole model,
@@ -287,8 +290,6 @@ for model_name in models_list:
 
     # Print the model we just instantiated
     print(model_ft)
-
-    train_loader, val_loader, test_loader, classes = load_data(input_size, batch_size)
 
     # Send the model to device (hopefully GPU :))
     model_ft = model_ft.to(device)
@@ -317,8 +318,6 @@ for model_name in models_list:
     # Setup the loss fxn
     criterion = nn.CrossEntropyLoss()
 
-    dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
-
     # Train and evaluate
     model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
 
@@ -338,8 +337,6 @@ for model_name in models_list:
                     'classes': classes})
 
     del model_ft
-    del dataloaders_dict
-    del train_loader, val_loader, test_loader
     torch.cuda.empty_cache()
 
 for m in results:
