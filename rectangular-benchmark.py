@@ -250,7 +250,7 @@ def load_data(input_size, batch_size):
                                             batch_size=batch_size,
                                             shuffle=False)
 
-    return train_loader, val_loader, test_loader, train_dataset.classes
+    return train_loader, val_loader, test_loader, tobacco_train.classes
     
 
 
