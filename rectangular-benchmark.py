@@ -264,7 +264,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 64 # Minibatch size
-num_epochs = 1
+num_epochs = 2
 learning_rate = 1e-3
 num_classes = 10
 
