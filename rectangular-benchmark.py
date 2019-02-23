@@ -1,3 +1,5 @@
+
+
 #%% 
 ########## Imports ##########
 import torch as torch
@@ -10,6 +12,7 @@ import matplotlib.pyplot as plt
 import time
 import os
 import copy
+
 print("PyTorch Version: ",torch.__version__)
 print("Torchvision Version: ",torchvision.__version__)
 
@@ -185,44 +188,50 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     return model_ft, input_size
 
 def load_data(input_size, batch_size):
-
-    # Define transform that we do on datasets
-    # Removed torchvision.transforms.Grayscale(num_output_channels=1)
-    transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize((input_size,input_size)),
-                                            transforms.RandomHorizontalFlip(),
-                                            torchvision.transforms.ToTensor(),
-                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
-    # We don't do a random horizontal flip on the test data!
-    transform_test = torchvision.transforms.Compose([torchvision.transforms.Resize((input_size,input_size)),
-                                            torchvision.transforms.ToTensor(),
-                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    target_resolution = (224, 224)
 
     print("Initializing Datasets and Dataloaders...")
 
-    # Define datasets
-    train_dataset = torchvision.datasets.ImageFolder('./Datasets/Tobacco/train',
-                                                    transform=transform_train)
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
+                                            transforms.RandomHorizontalFlip(),
+                                            torchvision.transforms.ToTensor(),
+                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    
+    transform_val = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
+                                            torchvision.transforms.ToTensor(),
+                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    
+    transform_test = torchvision.transforms.Compose([torchvision.transforms.Resize((input_size,input_size)),
+                                            torchvision.transforms.ToTensor(),
+                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    
+    tobacco_train = datasets.ImageFolder("datasets/Tobacco/train",
+                                        transform=transform_train)
 
-    test_dataset = torchvision.datasets.ImageFolder('./Datasets/Tobacco/test',
-                                                    transform=transform_test)
+    tobacco_val = datasets.ImageFolder("datasets/Tobacco/val",
+                                        transform=transform_val)
+
+    tobacco_test = datasets.ImageFolder("datasets/Tobacco/test",
+                                        transform=transform_test)
 
     # Load N number of datasets in train dataset
-    train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
+    train_loader = torch.utils.data.DataLoader(dataset=tobacco_train,
                                             batch_size=batch_size,
-                                            shuffle=True)
+                                            shuffle=True,
+                                            num_workers=8)
+
+    # Load n number of datasets into val dataset
+    val_loader = torch.utils.data.DataLoader(dataset=tobacco_val,
+                                            batch_size=batch_size,
+                                            num_workers=8)
 
     # Load N number of datasets into test dataset
-    test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
+    test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
                                             batch_size=batch_size,
                                             shuffle=False)
-    classes = train_dataset.classes
-    num_classes = len(classes)
-    print(classes)
-    print("Number of classes: ", num_classes)
-    assert (len(train_dataset.classes) == len(test_dataset.classes)), "Train and test dataset much have the same number of classes"
     
-    return train_loader, test_loader
+    return train_loader, val_loader, test_loader
+    
 
 
 #%%
@@ -261,7 +270,7 @@ for model_name in models_list:
     # Print the model we just instantiated
     print(model_ft)
 
-    train_loader, test_loader = load_data(input_size, batch_size)
+    train_loader, val_loader, test_loader = load_data(input_size, batch_size)
 
     # Send the model to device (hopefully GPU :))
     model_ft = model_ft.to(device)
