@@ -1,3 +1,6 @@
+Datasets/*
+.vscode/*
+Tobacco_split.zip
 datasets/*
 .vscode/*
 pretrained-models/*
