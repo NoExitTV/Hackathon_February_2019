@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import time
 import os
 import copy
+from alexnet import AlexNet
+from vgg import VGG, vgg13
 
 print("PyTorch Version: ",torch.__version__)
 print("Torchvision Version: ",torchvision.__version__)
@@ -176,29 +178,28 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     elif model_name == "alexnet":
         """ Pretrained alexnet
         """
-        model_ft = models.alexnet(pretrained=False)
+        model_ft = AlexNet()
         checkpoint = torch.load('./pretrained-models/alexnet/model_best.pth.tar')
         state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
         # set_parameter_requires_grad(model_ft, feature_extract)
-        # num_ftrs = model_ft.fc.in_features
-        model_ft.classifier[1] = nn.Linear(9216, 4096)
-        model_ft.classifier[6] = nn.Linear(4096, num_classes)
+        num_ftrs = model_ft.classifier[6].in_features
+        model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
     elif model_name == "vgg":
         """ Pretrained vgg
         """
-        model_ft = models.vgg13(pretrained=False)
+        model_ft = vgg13()
         checkpoint = torch.load('./pretrained-models/vgg/model_best.pth.tar')
         state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
         # set_parameter_requires_grad(model_ft, feature_extract)
-        # num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(4096, num_classes)
+        num_ftrs = model_ft.classifier[6].in_features
+        model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
     else:
         print("Invalid model name, exiting...")
@@ -266,7 +267,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 64 # Minibatch size
-num_epochs = 2
+num_epochs = 15
 learning_rate = 1e-3
 num_classes = 10
 
@@ -274,7 +275,8 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["resnet", "vgg", "alexnet"]
+#models_list = ["alexnet", "vgg", "resnet"]
+models_list = ["resnet"]
 results = []
 
 for model_name in models_list:
@@ -320,8 +322,6 @@ for model_name in models_list:
 
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
-    print(model_ft)
-
     # Train and evaluate
     #model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
 
@@ -337,7 +337,7 @@ for model_name in models_list:
 
 #%%
 ########## Plot some stuff ##########
-
+'''
 plt.title("Validation Accuracy vs. Number of Training Epochs")
 plt.xlabel("Training Epochs")
 plt.ylabel("Validation Accuracy")
@@ -353,6 +353,6 @@ plt.ylim((0,1.))
 plt.xticks(np.arange(1, num_epochs+1, 1.0))
 plt.legend()
 plt.show()
-
+'''
 
     
