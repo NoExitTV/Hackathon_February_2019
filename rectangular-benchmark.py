@@ -361,10 +361,10 @@ for model_name in models_list:
     torch.cuda.empty_cache()
 
 for m in results:
-    print('Accuracy of the network on the ' + str(m['total']) + ' test images: %d %%' % (100 * m['correct'] / m['total']))
+    print('Accuracy of the network on the ' + str(m['total']) + ' test images: %4d ' % (100 * m['correct'] / m['total']))
         
     for i in range(10):
-        print('Accuracy of %5s : %4d %%' % (m['classes'][i], 100 * m['class_correct'][i] / m['class_total'][i]))        
+        print('Accuracy of %5s : %4d ' % (m['classes'][i], 100 * m['class_correct'][i] / m['class_total'][i]))        
 
 
 #%%
