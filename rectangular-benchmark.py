@@ -137,6 +137,11 @@ def test_model(model, dataloaders, classes):
                         label = labels[i]
                         class_correct[label] += c[i].item()
                         class_total[label] += 1
+                    else:
+                        print("### WIERD ERROR ###")
+                        print("i: ", i)
+                        print("len(labels): ", len(labels))
+                        print("labels: ", labels)
                     
 
         time_elapsed = time.time() - since
@@ -145,7 +150,7 @@ def test_model(model, dataloaders, classes):
         print('Accuracy of the network on the ' + str(total) + ' test images: %d %%' % (100 * correct / total))
             
         for i in range(10):
-            print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))        
+            print('Accuracy of %5s : %4d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))        
         
         return correct, total, class_correct, class_total
 
@@ -213,17 +218,17 @@ def load_data(input_size, batch_size):
     resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((360, 480)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
 
-    transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
-                                            transforms.RandomHorizontalFlip(),
-                                            torchvision.transforms.ToTensor(),
-                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    # transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
+    #                                         transforms.RandomHorizontalFlip(),
+    #                                         torchvision.transforms.ToTensor(),
+    #                                         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-    #transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
-    #                                        transforms.RandomHorizontalFlip(),
-    #                                        torchvision.transforms.RandomRotation(20, resample=False, expand=False, center=None),
-    #                                        torchvision.transforms.RandomVerticalFlip(),
-    #                                        torchvision.transforms.ToTensor(),
-    #                                        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+                                           transforms.RandomHorizontalFlip(),
+                                           torchvision.transforms.RandomRotation(20, resample=False, expand=False, center=None),
+                                           torchvision.transforms.RandomVerticalFlip(),
+                                           torchvision.transforms.ToTensor(),
+                                           transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     transform_val = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
                                             torchvision.transforms.ToTensor(),
@@ -233,13 +238,13 @@ def load_data(input_size, batch_size):
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
-    tobacco_train = datasets.ImageFolder("datasets/Tobacco_aug/train",
+    tobacco_train = datasets.ImageFolder("datasets/Tobacco_split/train",
                                         transform=transform_train)
 
-    tobacco_val = datasets.ImageFolder("datasets/Tobacco_aug/val",
+    tobacco_val = datasets.ImageFolder("datasets/Tobacco_split/val",
                                         transform=transform_val)
 
-    tobacco_test = datasets.ImageFolder("datasets/Tobacco/test",
+    tobacco_test = datasets.ImageFolder("datasets/Tobacco_split/test",
                                         transform=transform_test)
 
     # Load N number of datasets in train dataset
@@ -258,8 +263,7 @@ def load_data(input_size, batch_size):
                                             batch_size=batch_size,
                                             shuffle=False)
 
-    return train_loader, val_loader, test_loader, tobacco_train.classes
-    
+    return train_loader, val_loader, test_loader, tobacco_train.classes    
 
 
 #%%
@@ -274,8 +278,8 @@ if torch.cuda.is_available():
     print("torch.cuda.device_count()", torch.cuda.device_count())
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
-batch_size = 32 # Minibatch size
-num_epochs = 50
+batch_size = 64 # Minibatch size
+num_epochs = 100
 learning_rate = 0.5e-3
 num_classes = 10
 
@@ -333,7 +337,7 @@ for model_name in models_list:
     model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
 
     # Save model
-    torch.save(model_ft.state_dict(), "./saved-models/"+model_name)
+    torch.save(model_ft.state_dict(), "./saved-models/"+model_name+"-rectangular.pth")
 
     # Test
     correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
@@ -347,6 +351,7 @@ for model_name in models_list:
                     'class_total': class_total,
                     'classes': classes})
 
+    # Some memory management!
     del model_ft
     torch.cuda.empty_cache()
 
@@ -354,8 +359,9 @@ for m in results:
     print('Accuracy of the network on the ' + str(m['total']) + ' test images: %d %%' % (100 * m['correct'] / m['total']))
         
     for i in range(10):
-        print('Accuracy of %5s : %2d %%' % (m['classes'][i], 100 * m['class_correct'][i] / m['class_total'][i]))        
-    
+        print('Accuracy of %5s : %4d %%' % (m['classes'][i], 100 * m['class_correct'][i] / m['class_total'][i]))        
+
+
 #%%
 ########## Plot some stuff ##########
 '''
