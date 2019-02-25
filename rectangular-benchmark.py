@@ -144,11 +144,11 @@ def test_model(model, dataloaders, classes):
 
         time_elapsed = time.time() - since
         print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-        
-        print('Accuracy of the network on the ' + str(total) + ' test images: %d %%' % (100 * correct / total))
+
+        print('Accuracy of the network on the ' + str(total) + ' test images: {:.4f}'.format(100.0 * correct / total))
             
         for i in range(10):
-            print('Accuracy of %5s : %4d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))        
+            print('Accuracy of {} : {:.4f}'.format(classes[i], 100.0 * class_correct[i] / class_total[i]))        
         
         return correct, total, class_correct, class_total
 
@@ -178,7 +178,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         
         # Add a dropout before last fc layer
         model_ft.fc = nn.Sequential(
-            nn.Dropout(0.250),
+            nn.Dropout(0.20),
             nn.Linear(4096, num_classes)
         ) 
 
@@ -216,11 +216,11 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     return model_ft, input_size
 
 def load_data(input_size, batch_size):
-    target_resolution = (240, 320)
+    target_resolution = (480, 640)
 
     print("Initializing Datasets and Dataloaders...")
 
-    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((360, 480)),
+    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
 
     # transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
@@ -284,7 +284,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 64 # Minibatch size
-num_epochs = 2
+num_epochs = 200
 learning_rate = 0.5e-3
 num_classes = 10
 
@@ -361,10 +361,11 @@ for model_name in models_list:
     torch.cuda.empty_cache()
 
 for m in results:
-    print('Accuracy of the network on the ' + str(m['total']) + ' test images: %4d ' % (100 * m['correct'] / m['total']))
-        
+    print(m['model_name']+":")
+    print('Accuracy of the network on the ' + str(m['total']) + ' test images: {:.4f}'.format(100.0 * m['correct'] / m['total']))
+
     for i in range(10):
-        print('Accuracy of %5s : %4d ' % (m['classes'][i], 100 * m['class_correct'][i] / m['class_total'][i]))        
+        print('Accuracy of {} : {:.4f}'.format(m['classes'][i], 100.0 * m['class_correct'][i] / m['class_total'][i]))        
 
 
 #%%
