@@ -178,7 +178,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         
         # Add a dropout before last fc layer
         model_ft.fc = nn.Sequential(
-            nn.Dropout(0.25),
+            nn.Dropout(0.250),
             nn.Linear(4096, num_classes)
         ) 
 
