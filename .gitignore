@@ -1,3 +1,4 @@
 .vscode/*
 datasets/*
 pretrained-models/*
+__pycache__/*
