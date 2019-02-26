@@ -169,8 +169,9 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Fa
         
         # Change last fc layer
         model_ft.fc = nn.Sequential(
-            nn.Dropout(p=0.1),
+            nn.Dropout(p=0.5),
             nn.Linear(64512, 4096),
+            nn.Dropout(p=0.5),
             nn.Linear(4096, num_classes)
         ) 
 
@@ -275,7 +276,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 16 # Minibatch size
-num_epochs = 50
+num_epochs = 75
 learning_rate = 0.5e-3
 num_classes = 10
 
