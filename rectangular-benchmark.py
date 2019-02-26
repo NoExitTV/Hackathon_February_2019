@@ -173,13 +173,13 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
         set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.fc.in_features
+        # num_ftrs = model_ft.fc.in_features
         # model_ft.fc = nn.Linear(4096, num_classes)
         
-        # Add a dropout before last fc layer
+        # Change last layer
         model_ft.fc = nn.Sequential(
-            nn.Dropout(0.20),
-            nn.Linear(64512, num_classes)
+            nn.Linear(64512, 4096),
+            nn.Linear(4096, num_classes)
         ) 
 
 
@@ -283,7 +283,7 @@ if torch.cuda.is_available():
     print("torch.cuda.device_count()", torch.cuda.device_count())
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
-batch_size = 32 # Minibatch size
+batch_size = 16 # Minibatch size
 num_epochs = 200
 learning_rate = 0.5e-3
 num_classes = 10
