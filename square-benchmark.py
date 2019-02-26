@@ -243,7 +243,7 @@ def load_data(input_size, batch_size):
     print("Initializing Datasets and Dataloaders...")
     print("Target resolution: ", target_resolution)
 
-    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((int(input_size*1.5)), int(input_size*1.5))),
+    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((int(input_size*1.5)), int(input_size*1.5)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
 
     transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
