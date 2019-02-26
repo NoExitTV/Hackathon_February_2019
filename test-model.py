@@ -120,7 +120,7 @@ def initialize_model(model_name, num_classes, feature_extract, saved_model_path)
 
     return model_ft, input_size
 
-def load_data(input_size, batch_size):
+def load_data(batch_size):
     target_resolution = (480, 640)
 
     print("Initializing Datasets and Dataloaders...")
@@ -163,7 +163,7 @@ best_resnet_model_path = "./saved-models/resnet-rectangular-80images-best.pth"
 models_list = ["resnet"]
 results = []
 
-test_loader, classes = load_data(0, 0)
+test_loader, classes = load_data(batch_size)
 dataloaders_dict = {"train": None, "test": test_loader, "val": None}
 
 for model_name in models_list:
