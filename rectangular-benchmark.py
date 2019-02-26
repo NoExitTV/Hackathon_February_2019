@@ -174,15 +174,14 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         model_ft.eval()
         set_parameter_requires_grad(model_ft, feature_extract)
         # num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(64512, num_classes)
+        # model_ft.fc = nn.Linear(64512, num_classes)
         
         # Change last layer
-        # model_ft.fc = nn.Sequential(
-        #     nn.Dropout(p=0.1),
-        #     nn.Linear(64512, 4096),
-        #     nn.Dropout(p=0.1),
-        #     nn.Linear(4096, num_classes)
-        # ) 
+        model_ft.fc = nn.Sequential(
+            nn.Dropout(p=0.1),
+            nn.Linear(64512, 4096),
+            nn.Linear(4096, num_classes)
+        ) 
 
 
     elif model_name == "alexnet":
@@ -222,20 +221,20 @@ def load_data(input_size, batch_size):
 
     print("Initializing Datasets and Dataloaders...")
 
-    # resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((360, 480)),
-    #                                         torchvision.transforms.RandomCrop(target_resolution)])
+    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
+                                            torchvision.transforms.RandomCrop(target_resolution)])
 
-    # transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
-    #                                        transforms.RandomHorizontalFlip(),
-    #                                        torchvision.transforms.RandomRotation((-20,20), resample=False, expand=False, center=None),
-    #                                        torchvision.transforms.RandomVerticalFlip(),
-    #                                        torchvision.transforms.ToTensor(),
-    #                                        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+                                           transforms.RandomHorizontalFlip(),
+                                           torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
+                                           #torchvision.transforms.RandomVerticalFlip(),
+                                           torchvision.transforms.ToTensor(),
+                                           transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-    transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
-                                            transforms.RandomHorizontalFlip(),
-                                            torchvision.transforms.ToTensor(),
-                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    # transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
+    #                                         transforms.RandomHorizontalFlip(),
+    #                                         torchvision.transforms.ToTensor(),
+    #                                         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     transform_val = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
                                             torchvision.transforms.ToTensor(),
@@ -285,9 +284,9 @@ if torch.cuda.is_available():
     print("torch.cuda.device_count()", torch.cuda.device_count())
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
-batch_size = 24 # Minibatch size
+batch_size = 16 # Minibatch size
 num_epochs = 75
-learning_rate = 1e-3
+learning_rate = 0.5e-3
 num_classes = 10
 
 
