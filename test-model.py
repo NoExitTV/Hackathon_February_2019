@@ -49,11 +49,6 @@ def test_model(model, dataloaders, classes):
                     label = labels[i]
                     class_correct[label] += c[i].item()
                     class_total[label] += 1
-                    if not(i < len(labels)):
-                        print("### WIERD ERROR ###")
-                        print("i: ", i)
-                        print("len(labels): ", len(labels))
-                        print("labels: ", labels)
 
         time_elapsed = time.time() - since
         print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
@@ -65,72 +60,26 @@ def test_model(model, dataloaders, classes):
         
         return correct, total, class_correct, class_total
 
-def initialize_model(model_name, num_classes, feature_extract, saved_model_path):
-    # Initialize these variables which will be set in this if statement. Each of these
-    #   variables is model specific.
-    model_ft = None
-    input_size = 0
+def initialize_model(num_classes, saved_model_path):
+    """ Pretrained resnet
+    """
+    model_ft = models.resnet18(pretrained=False)
 
-    if model_name == "resnet":
-        """ Pretrained resnet
-        """
-        model_ft = models.resnet18(pretrained=False)
+    # Change last layer to the same architecture we had during training!
+    model_ft.fc = nn.Sequential(
+        nn.Dropout(p=0.1),
+        nn.Linear(64512, 4096),
+        nn.Linear(4096, num_classes)
+    ) 
 
-        # Change last layer
-        model_ft.fc = nn.Sequential(
-            nn.Dropout(p=0.1),
-            nn.Linear(64512, 4096),
-            nn.Linear(4096, num_classes)
-        ) 
+    # Load weights
+    model_ft.load_state_dict(torch.load(saved_model_path))
+    model_ft.eval()
 
-        # Load weights
-        model_ft.load_state_dict(torch.load(saved_model_path))
-        model_ft.eval()
-
-        # num_ftrs = model_ft.fc.in_features
-        # model_ft.fc = nn.Linear(64512, num_classes)
-        
-        # Change last layer
-        # model_ft.fc = nn.Sequential(
-        #     nn.Dropout(p=0.1),
-        #     nn.Linear(64512, 4096),
-        #     nn.Linear(4096, num_classes)
-        # ) 
-
-    elif model_name == "alexnet":
-        """ Pretrained alexnet
-        """
-        model_ft = AlexNet()
-        checkpoint = torch.load('./pretrained-models/alexnet/model_best.pth.tar')
-        state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
-                    'state_dict'].items()}
-        model_ft.load_state_dict(state_dict)
-        model_ft.eval()
-        # set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
-
-    elif model_name == "vgg":
-        """ Pretrained vgg
-        """
-        model_ft = vgg13()
-        checkpoint = torch.load('./pretrained-models/vgg/model_best.pth.tar')
-        state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
-                    'state_dict'].items()}
-        model_ft.load_state_dict(state_dict)
-        model_ft.eval()
-        # set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
-
-    else:
-        print("Invalid model name, exiting...")
-        exit()
-
-    return model_ft, input_size
+    return model_ft
 
 def load_data(batch_size):
-    target_resolution = (480, 640)
+    target_resolution = (480, 640) # Same size as the model was trained on!
 
     print("Initializing Datasets and Dataloaders...")
     
@@ -163,7 +112,7 @@ if torch.cuda.is_available():
 
 batch_size = 16 # Minibatch size
 num_classes = 10
-best_resnet_model_path = "./saved-models/resnet-rectangular-80images-best.pth"
+best_resnet_model_path = "./saved-models/resnet-rectangular-80images-best.pth" # Load trained model from here!
 
 #%%
 ########## Run tests ##########
@@ -182,7 +131,7 @@ for model_name in models_list:
     feature_extract = False
 
     # Initialize the model for this run
-    model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, best_resnet_model_path)
+    model_ft, input_size = initialize_model(num_classes, best_resnet_model_path)
 
     # Print the model we just instantiated
     print(model_ft)
