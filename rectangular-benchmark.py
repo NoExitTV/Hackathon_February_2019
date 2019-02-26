@@ -143,7 +143,7 @@ def test_model(model, dataloaders, classes):
         time_elapsed = time.time() - since
         print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
 
-        print('Accuracy of the network on the ' + str(total) + ' test images: {:.4f}'.format(100.0 * correct / total))
+        print('Accuracy of the network on the ' + str(total) + ' test images: {:.4f} %'.format(100.0 * correct / total))
             
         for i in range(10):
             print('Accuracy of {} : {:.4f}'.format(classes[i], 100.0 * class_correct[i] / class_total[i]))        
@@ -297,6 +297,7 @@ results = []
 train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
 dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
+run_numb = 1 # Keep track of the number of runs we've been doing
 for model_name in models_list:
 
     # Flag for feature extracting. When False, we finetune the whole model,
@@ -307,7 +308,9 @@ for model_name in models_list:
     model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
 
     # Print the model we just instantiated
-    print(model_ft)
+    # print(model_ft)
+    print("Run number: {} / {}".format(run_numb, len(models_list)))
+    run_numb += 1
 
     # Send the model to device (hopefully GPU :))
     model_ft = model_ft.to(device)
@@ -340,7 +343,7 @@ for model_name in models_list:
     model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
 
     # Save model
-    torch.save(model_ft.state_dict(), "./saved-models/"+model_name+"-rectangular.pth")
+    torch.save(model_ft.state_dict(), "./saved-models/" + model_name + "-rectangular.pth")
 
     # Test
     correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
@@ -367,30 +370,12 @@ for m in results:
     total_correct += m['correct']
 
     print(m['model_name']+":")
-    print('Accuracy of the network on the ' + str(m['total']) + ' test images: {:.4f}'.format(100.0 * m['correct'] / m['total']))
+    print('Accuracy of the network on the ' + str(m['total']) + ' test images: {:.4f} %'.format(100.0 * m['correct'] / m['total']))
 
     for i in range(10):
         print('Accuracy of {} : {:.4f}'.format(m['classes'][i], 100.0 * m['class_correct'][i] / m['class_total'][i]))        
 
 # Print average accuracy
 print("\n")
-print("Average accuracy:")
-print('Average accuracy on ' + str(total) + ' test images: {:.4f}'.format(100.0 * total_correct / total))
-
-#%%
-########## Plot some stuff ##########
-# plt.title("Validation Accuracy vs. Number of Training Epochs")
-# plt.xlabel("Training Epochs")
-# plt.ylabel("Validation Accuracy")
-
-# for result in results:
-#     model_name = result['model_name']
-#     hist = result['hist']
-#     ohist = []
-#     ohist = [h.cpu().numpy() for h in hist]
-#     plt.plot(range(1,num_epochs+1),ohist,label=model_name)
-
-# plt.ylim((0,1.))
-# plt.xticks(np.arange(1, num_epochs+1, 1.0))
-# plt.legend()
-# plt.show()
+print('Average accuracy on ' + str(total) + ' test images: {:.4f} %'.format(100.0 * total_correct / total))
+print("Total correct: {} | Total number of images: {}".format(total_correct, total))
