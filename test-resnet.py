@@ -130,7 +130,7 @@ for model_name in models_list:
     feature_extract = False
 
     # Initialize the model for this run
-    model_ft, input_size = initialize_model(num_classes, best_resnet_model_path)
+    model_ft = initialize_model(num_classes, best_resnet_model_path)
 
     # Print the model we just instantiated
     print(model_ft)
