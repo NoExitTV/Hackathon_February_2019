@@ -247,8 +247,8 @@ def load_data(input_size, batch_size):
 
     transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
                                            transforms.RandomHorizontalFlip(),
-                                           torchvision.transforms.RandomRotation((-20,20), resample=False, expand=False, center=None),
-                                           torchvision.transforms.RandomVerticalFlip(),
+                                           torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
+                                           #torchvision.transforms.RandomVerticalFlip(),
                                            torchvision.transforms.ToTensor(),
                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
@@ -271,7 +271,7 @@ def load_data(input_size, batch_size):
     tobacco_val = datasets.ImageFolder("datasets/Tobacco_split/val",
                                         transform=transform_val)
 
-    tobacco_test = datasets.ImageFolder("datasets/Tobacco_original/test",
+    tobacco_test = datasets.ImageFolder("datasets/Tobacco_original/test",   # We test on the original Tobacco test split
                                         transform=transform_test)
 
     # Load N number of datasets in train dataset
@@ -306,8 +306,8 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 16 # Minibatch size
-num_epochs = 25
-learning_rate = 1e-3
+num_epochs = 75
+learning_rate = 0.5e-3
 num_classes = 10
 
 
@@ -315,7 +315,7 @@ num_classes = 10
 ########## Run tests ##########
 
 #models_list = ["resnet", "alexnet", "vgg"]
-models_list = ["resnet50"]
+models_list = ["resnet18"]
 results = []
 
 for model_name in models_list:
@@ -365,7 +365,7 @@ for model_name in models_list:
     model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
 
     # Save model
-    torch.save(model_ft.state_dict(), "./saved-models/"+model_name+"-rectangular.pth")
+    torch.save(model_ft.state_dict(), "./saved-models/"+model_name+"-square.pth")
 
     # Test
     correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)

@@ -1,0 +1,41 @@
+### Hyperparameters:###
+batch_size = 16 # Minibatch size
+num_epochs = 75
+learning_rate = 0.5e-3
+num_classes = 10
+
+### Transforms: ###
+target_resolution = (480, 640)
+resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
+                                            torchvision.transforms.RandomCrop(target_resolution)])
+
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+                                           transforms.RandomHorizontalFlip(),
+                                           torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
+                                           #torchvision.transforms.RandomVerticalFlip(),
+                                           torchvision.transforms.ToTensor(),
+                                           transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+### Layer modifications:###
+model_ft.fc = nn.Sequential(
+            nn.Dropout(p=0.1),
+            nn.Linear(64512, 4096),
+            nn.Linear(4096, num_classes)
+        ) 
+
+### Results: ###
+resnet:
+Accuracy of the network on the 2482 test images: 78.3239
+Accuracy of ADVE : 87.8049
+Accuracy of Email : 89.1374
+Accuracy of Form : 80.0000
+Accuracy of Letter : 83.2765
+Accuracy of Memo : 73.0887
+Accuracy of News : 100.0000
+Accuracy of Note : 75.3846
+Accuracy of Report : 49.0196
+Accuracy of Resume : 63.6364
+Accuracy of Scientific : 47.5248
+
+### Other info ###
+Tested on the splitted dataset test and not the original test split in the dataset...

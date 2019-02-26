@@ -388,5 +388,3 @@ plt.xticks(np.arange(1, num_epochs+1, 1.0))
 plt.legend()
 plt.show()
 '''
-
-    
