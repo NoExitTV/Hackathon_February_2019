@@ -241,6 +241,7 @@ def load_data(input_size, batch_size):
     target_resolution = (input_size, input_size)
 
     print("Initializing Datasets and Dataloaders...")
+    print("Target resolution: ", target_resolution)
 
     resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((input_size*1.5, input_size*1.5)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
@@ -327,6 +328,7 @@ for model_name in models_list:
     # Initialize the model for this run
     model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
 
+    print("##### INPUT SIZE ##### ", input_size)
     # initialize dataset
     train_loader, val_loader, test_loader, classes = load_data(input_size, batch_size)
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
