@@ -120,7 +120,6 @@ def test_model(model, dataloaders, classes):
                 labels = labels.to(device)
 
                 outputs = model(inputs)
-
                 _, preds = torch.max(outputs, 1)
 
                 # Overall accuracy
@@ -129,7 +128,7 @@ def test_model(model, dataloaders, classes):
 
                 # Accuracy per class
                 c = (preds == labels).squeeze()
-                for i in range(10):
+                for i in range(len(labels)):
                     if i < len(labels):
                         label = labels[i]
                         class_correct[label] += c[i].item()
@@ -181,7 +180,6 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
             nn.Linear(64512, 4096),
             nn.Linear(4096, num_classes)
         ) 
-
 
     elif model_name == "alexnet":
         """ Pretrained alexnet
@@ -370,20 +368,18 @@ for m in results:
 
 #%%
 ########## Plot some stuff ##########
-'''
-plt.title("Validation Accuracy vs. Number of Training Epochs")
-plt.xlabel("Training Epochs")
-plt.ylabel("Validation Accuracy")
+# plt.title("Validation Accuracy vs. Number of Training Epochs")
+# plt.xlabel("Training Epochs")
+# plt.ylabel("Validation Accuracy")
 
-for result in results:
-    model_name = result['model_name']
-    hist = result['hist']
-    ohist = []
-    ohist = [h.cpu().numpy() for h in hist]
-    plt.plot(range(1,num_epochs+1),ohist,label=model_name)
+# for result in results:
+#     model_name = result['model_name']
+#     hist = result['hist']
+#     ohist = []
+#     ohist = [h.cpu().numpy() for h in hist]
+#     plt.plot(range(1,num_epochs+1),ohist,label=model_name)
 
-plt.ylim((0,1.))
-plt.xticks(np.arange(1, num_epochs+1, 1.0))
-plt.legend()
-plt.show()
-'''
+# plt.ylim((0,1.))
+# plt.xticks(np.arange(1, num_epochs+1, 1.0))
+# plt.legend()
+# plt.show()
