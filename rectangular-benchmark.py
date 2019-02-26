@@ -143,10 +143,10 @@ def test_model(model, dataloaders, classes):
         time_elapsed = time.time() - since
         print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
 
-        print('Accuracy of the network on the ' + str(total) + ' test images: {:.4f} %'.format(100.0 * correct / total))
+        print('Accuracy of the network on the ' + str(total) + ' test images: {:.4f} %%'.format(100.0 * correct / total))
             
         for i in range(10):
-            print('Accuracy of {} : {:.4f}'.format(classes[i], 100.0 * class_correct[i] / class_total[i]))        
+            print('Accuracy of {} : {:.4f} %%'.format(classes[i], 100.0 * class_correct[i] / class_total[i]))        
         
         return correct, total, class_correct, class_total
 
@@ -155,7 +155,7 @@ def set_parameter_requires_grad(model, feature_extracting):
         for param in model.parameters():
             param.requires_grad = False
 
-def initialize_model(model_name, num_classes, feature_extract, use_pretrained=True):
+def initialize_model(model_name, num_classes, feature_extract, use_pretrained=False):
     # Initialize these variables which will be set in this if statement. Each of these
     #   variables is model specific.
     model_ft = None
@@ -164,17 +164,16 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     if model_name == "resnet":
         """ Pretrained resnet
         """
-        model_ft = models.resnet18(pretrained=False)
+        model_ft = models.resnet18(pretrained=use_pretrained)
         checkpoint = torch.load('./pretrained-models/resnet/model_best.pth.tar')
-        state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
-                    'state_dict'].items()}
+        state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint['state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
         set_parameter_requires_grad(model_ft, feature_extract)
         # num_ftrs = model_ft.fc.in_features
         # model_ft.fc = nn.Linear(64512, num_classes)
         
-        # Change last layer
+        # Change last fc layer
         model_ft.fc = nn.Sequential(
             nn.Dropout(p=0.1),
             nn.Linear(64512, 4096),
@@ -290,8 +289,7 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-#models_list = ["resnet", "alexnet", "vgg"]
-models_list = ["resnet" for i in range(5)]
+models_list = ["resnet" for i in range(5)]  # Run the same model and calc average
 results = []
 
 train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
@@ -305,11 +303,11 @@ for model_name in models_list:
     feature_extract = False
 
     # Initialize the model for this run
-    model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
+    model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=False)
 
     # Print the model we just instantiated
-    # print(model_ft)
-    print("Run number: {} / {}".format(run_numb, len(models_list)))
+    print(model_ft)
+    print("\nRun number: {} / {}\n".format(run_numb, len(models_list)))
     run_numb += 1
 
     # Send the model to device (hopefully GPU :))
@@ -370,12 +368,12 @@ for m in results:
     total_correct += m['correct']
 
     print(m['model_name']+":")
-    print('Accuracy of the network on the ' + str(m['total']) + ' test images: {:.4f} %'.format(100.0 * m['correct'] / m['total']))
+    print('Accuracy of the network on the ' + str(m['total']) + ' test images: {:.4f} %%'.format(100.0 * m['correct'] / m['total']))
 
     for i in range(10):
         print('Accuracy of {} : {:.4f}'.format(m['classes'][i], 100.0 * m['class_correct'][i] / m['class_total'][i]))        
 
 # Print average accuracy
 print("\n")
-print('Average accuracy on ' + str(total) + ' test images: {:.4f} %'.format(100.0 * total_correct / total))
+print('Average accuracy on ' + str(total) + ' test images: {:.4f} %%'.format(100.0 * total_correct / total))
 print("Total correct: {} | Total number of images: {}".format(total_correct, total))
