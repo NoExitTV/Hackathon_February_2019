@@ -282,7 +282,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 16 # Minibatch size
-num_epochs = 75
+num_epochs = 1
 learning_rate = 0.5e-3
 num_classes = 10
 
@@ -291,7 +291,7 @@ num_classes = 10
 ########## Run tests ##########
 
 #models_list = ["resnet", "alexnet", "vgg"]
-models_list = ["resnet"]
+models_list = ["resnet" for i in range(5)]
 results = []
 
 train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
@@ -358,13 +358,24 @@ for model_name in models_list:
     del model_ft
     torch.cuda.empty_cache()
 
+# Print results and calculate average
+total = 0
+total_correct = 0
 for m in results:
+
+    total += m['total']
+    total_correct += m['correct']
+
     print(m['model_name']+":")
     print('Accuracy of the network on the ' + str(m['total']) + ' test images: {:.4f}'.format(100.0 * m['correct'] / m['total']))
 
     for i in range(10):
         print('Accuracy of {} : {:.4f}'.format(m['classes'][i], 100.0 * m['class_correct'][i] / m['class_total'][i]))        
 
+# Print average accuracy
+print("\n")
+print("Average accuracy:")
+print('Average accuracy on ' + str(total) + ' test images: {:.4f}'.format(100.0 * total_correct / total))
 
 #%%
 ########## Plot some stuff ##########

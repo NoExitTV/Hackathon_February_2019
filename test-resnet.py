@@ -116,42 +116,34 @@ best_resnet_model_path = "./saved-models/resnet-rectangular-80images-best.pth" #
 #%%
 ########## Run tests ##########
 
-#models_list = ["resnet", "alexnet", "vgg"]
-models_list = ["resnet"]
 results = []
 
 test_loader, classes = load_data(batch_size)
 dataloaders_dict = {"train": None, "test": test_loader, "val": None}
 
-for model_name in models_list:
+# Initialize the model for this run
+model_ft = initialize_model(num_classes, best_resnet_model_path)
 
-    # Flag for feature extracting. When False, we finetune the whole model,
-    #   when True we only update the reshaped layer params
-    feature_extract = False
+# Print the model we just instantiated
+print(model_ft)
 
-    # Initialize the model for this run
-    model_ft = initialize_model(num_classes, best_resnet_model_path)
+# Send the model to device (hopefully GPU :))
+model_ft = model_ft.to(device)
 
-    # Print the model we just instantiated
-    print(model_ft)
+# Test
+correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
 
-    # Send the model to device (hopefully GPU :))
-    model_ft = model_ft.to(device)
+# Add model results
+results.append({'model_name': "resnet",
+                'correct': correct,
+                'total': total,
+                'class_correct': class_correct,
+                'class_total': class_total,
+                'classes': classes})
 
-    # Test
-    correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
-
-    # Add model results
-    results.append({'model_name': model_name,
-                    'correct': correct,
-                    'total': total,
-                    'class_correct': class_correct,
-                    'class_total': class_total,
-                    'classes': classes})
-
-    # Some memory management!
-    del model_ft
-    torch.cuda.empty_cache()
+# Some memory management!
+del model_ft
+torch.cuda.empty_cache()
 
 for m in results:
     print(m['model_name']+":")

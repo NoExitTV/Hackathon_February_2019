@@ -15,7 +15,6 @@ def check_and_make_dir(set_name, classes):
 
 t = Tobacco("datasets/Tobacco/", num_splits=1)
 
-
 phases = ['train', 'val', 'test']
 for phase in phases:
     check_and_make_dir(phase, CLASSES)
