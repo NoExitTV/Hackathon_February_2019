@@ -243,20 +243,20 @@ def load_data(input_size, batch_size):
     print("Initializing Datasets and Dataloaders...")
     print("Target resolution: ", target_resolution)
 
-    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((input_size*1.5, input_size*1.5)),
-                                            torchvision.transforms.RandomCrop(target_resolution)])
+    # resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((int(input_size*1.5)), int(input_size*1.5))),
+    #                                         torchvision.transforms.RandomCrop(target_resolution)])
 
-    transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
-                                           transforms.RandomHorizontalFlip(),
-                                           torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
-                                           #torchvision.transforms.RandomVerticalFlip(),
-                                           torchvision.transforms.ToTensor(),
-                                           transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    # transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+    #                                        transforms.RandomHorizontalFlip(),
+    #                                        torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
+    #                                        #torchvision.transforms.RandomVerticalFlip(),
+    #                                        torchvision.transforms.ToTensor(),
+    #                                        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-    # transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
-    #                                         transforms.RandomHorizontalFlip(),
-    #                                         torchvision.transforms.ToTensor(),
-    #                                         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
+                                            transforms.RandomHorizontalFlip(),
+                                            torchvision.transforms.ToTensor(),
+                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     transform_val = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
                                             torchvision.transforms.ToTensor(),
