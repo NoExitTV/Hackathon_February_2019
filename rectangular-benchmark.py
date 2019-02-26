@@ -143,10 +143,10 @@ def test_model(model, dataloaders, classes):
         time_elapsed = time.time() - since
         print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
 
-        print('Accuracy of the network on the ' + str(total) + ' test images: {:.4f} %%'.format(100.0 * correct / total))
+        print('Accuracy of the network on the ' + str(total) + ' test images: {:.4f} %'.format(100.0 * correct / total))
             
         for i in range(10):
-            print('Accuracy of {} : {:.4f} %%'.format(classes[i], 100.0 * class_correct[i] / class_total[i]))        
+            print('Accuracy of {} : {:.4f} %'.format(classes[i], 100.0 * class_correct[i] / class_total[i]))        
         
         return correct, total, class_correct, class_total
 
@@ -281,7 +281,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 16 # Minibatch size
-num_epochs = 1
+num_epochs = 75
 learning_rate = 0.5e-3
 num_classes = 10
 
@@ -289,7 +289,7 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["resnet" for i in range(2)]  # Run the same model and calc average
+models_list = ["resnet" for i in range(5)]  # Run the same model and calc average
 results = []
 
 train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
@@ -368,12 +368,12 @@ for m in results:
     total_correct += m['correct']
 
     print(m['model_name']+":")
-    print('Accuracy of the network on the ' + str(m['total']) + ' test images: {:.4f} %%'.format(100.0 * m['correct'] / m['total']))
+    print('Accuracy of the network on the ' + str(m['total']) + ' test images: {:.4f} %'.format(100.0 * m['correct'] / m['total']))
 
     for i in range(10):
-        print('Accuracy of {} : {:.4f}'.format(m['classes'][i], 100.0 * m['class_correct'][i] / m['class_total'][i]))        
+        print('Accuracy of {} : {:.4f} %'.format(m['classes'][i], 100.0 * m['class_correct'][i] / m['class_total'][i]))        
 
 # Print average accuracy
 print("\n")
-print('Average accuracy on ' + str(total) + ' test images: {:.4f} %%'.format(100.0 * total_correct / total))
+print('Average accuracy on ' + str(total) + ' test images in ' +  str(len(models_list)) + ' number of runs: {:.4f} %'.format(100.0 * total_correct / total))
 print("Total correct: {} | Total number of images: {}".format(total_correct, total))
