@@ -75,6 +75,15 @@ def initialize_model(model_name, num_classes, feature_extract, saved_model_path)
         """ Pretrained resnet
         """
         model_ft = models.resnet18(pretrained=False)
+
+        # Change last layer
+        model_ft.fc = nn.Sequential(
+            nn.Dropout(p=0.1),
+            nn.Linear(64512, 4096),
+            nn.Linear(4096, num_classes)
+        ) 
+
+        # Load weights
         model_ft.load_state_dict(torch.load(saved_model_path))
         model_ft.eval()
 
