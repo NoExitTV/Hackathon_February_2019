@@ -289,7 +289,7 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["resnet" for i in range(5)]  # Run the same model and calc average
+models_list = ["resnet" for i in range(2)]  # Run the same model and calc average
 results = []
 
 train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
