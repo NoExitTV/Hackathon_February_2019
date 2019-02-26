@@ -1,12 +1,10 @@
-Hyperparameters:
-
+### Hyperparameters:###
 batch_size = 16 # Minibatch size
 num_epochs = 200
 learning_rate = 0.5e-3
 num_classes = 10
 
-Transforms:
-
+### Transforms: ###
 target_resolution = (480, 640)
 resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
@@ -18,6 +16,13 @@ transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomC
                                         torchvision.transforms.ToTensor(),
                                         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
+### Layer modifications:###
+model_ft.fc = nn.Sequential(
+            nn.Linear(64512, 4096),
+            nn.Linear(4096, num_classes)
+        ) 
+
+### Results: ###
 resnet:
 Accuracy of the network on the 2482 test images: 77.3167
 Accuracy of ADVE : 95.1220
