@@ -301,7 +301,9 @@ for model_name in models_list:
     model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=False)
 
     # Print the model we just instantiated
-    # print(model_ft)
+    if run_numb == 1:
+        print(model_ft)
+        
     print("\nRun number: {} / {}\n".format(run_numb, len(models_list)))
     run_numb += 1
 
