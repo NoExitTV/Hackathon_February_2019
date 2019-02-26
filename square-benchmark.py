@@ -239,6 +239,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
 
 def load_data(input_size, batch_size):
     target_resolution = (input_size, input_size)
+    resize_resolution = (int(input_size*1.5), int(input_size*1.5))
 
     print("Initializing Datasets and Dataloaders...")
     print("Target resolution: ", target_resolution)
@@ -272,7 +273,7 @@ def load_data(input_size, batch_size):
     tobacco_val = datasets.ImageFolder("datasets/Tobacco_split/val",
                                         transform=transform_val)
 
-    tobacco_test = datasets.ImageFolder("datasets/Tobacco_original/test",   # We test on the original Tobacco test split
+    tobacco_test = datasets.ImageFolder("datasets/Tobacco_split/test",   # We test on the original Tobacco test split
                                         transform=transform_test)
 
     # Load N number of datasets in train dataset

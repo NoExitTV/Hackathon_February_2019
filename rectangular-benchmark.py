@@ -120,7 +120,6 @@ def test_model(model, dataloaders, classes):
                 labels = labels.to(device)
 
                 outputs = model(inputs)
-                loss = criterion(outputs, labels)
 
                 _, preds = torch.max(outputs, 1)
 
@@ -250,7 +249,7 @@ def load_data(input_size, batch_size):
     tobacco_val = datasets.ImageFolder("datasets/Tobacco_split/val",
                                         transform=transform_val)
 
-    tobacco_test = datasets.ImageFolder("datasets/Tobacco_original/test",
+    tobacco_test = datasets.ImageFolder("datasets/Tobacco_split/test",
                                         transform=transform_test)
 
     # Load N number of datasets in train dataset
