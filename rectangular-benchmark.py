@@ -129,15 +129,9 @@ def test_model(model, dataloaders, classes):
                 # Accuracy per class
                 c = (preds == labels).squeeze()
                 for i in range(len(labels)):
-                    if i < len(labels):
-                        label = labels[i]
-                        class_correct[label] += c[i].item()
-                        class_total[label] += 1
-                    else:
-                        print("### WIERD ERROR ###")
-                        print("i: ", i)
-                        print("len(labels): ", len(labels))
-                        print("labels: ", labels)
+                    label = labels[i]
+                    class_correct[label] += c[i].item()
+                    class_total[label] += 1
                     
 
         time_elapsed = time.time() - since
@@ -281,7 +275,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 16 # Minibatch size
-num_epochs = 75
+num_epochs = 50
 learning_rate = 0.5e-3
 num_classes = 10
 

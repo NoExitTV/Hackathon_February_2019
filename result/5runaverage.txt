@@ -1,0 +1,68 @@
+resnet:
+Accuracy of the network on the 2482 test images: 75.9065 %
+Accuracy of ADVE : 95.3846 %
+Accuracy of Email : 96.7936 %
+Accuracy of Form : 81.8731 %
+Accuracy of Letter : 50.7495 %
+Accuracy of Memo : 76.1538 %
+Accuracy of News : 96.5909 %
+Accuracy of Note : 76.2376 %
+Accuracy of Report : 61.2121 %
+Accuracy of Resume : 80.0000 %
+Accuracy of Scientific : 58.3851 %
+
+resnet:
+Accuracy of the network on the 2482 test images: 77.0346 %
+Accuracy of ADVE : 83.8462 %
+Accuracy of Email : 93.1864 %
+Accuracy of Form : 79.7583 %
+Accuracy of Letter : 72.5910 %
+Accuracy of Memo : 75.7692 %
+Accuracy of News : 97.7273 %
+Accuracy of Note : 72.2772 %
+Accuracy of Report : 56.9697 %
+Accuracy of Resume : 75.0000 %
+Accuracy of Scientific : 45.3416 %
+
+resnet:
+Accuracy of the network on the 2482 test images: 76.4303 %
+Accuracy of ADVE : 89.2308 %
+Accuracy of Email : 88.5772 %
+Accuracy of Form : 87.0091 %
+Accuracy of Letter : 78.5867 %
+Accuracy of Memo : 61.1538 %
+Accuracy of News : 97.7273 %
+Accuracy of Note : 78.2178 %
+Accuracy of Report : 60.6061 %
+Accuracy of Resume : 85.0000 %
+Accuracy of Scientific : 52.1739 %
+
+resnet:
+Accuracy of the network on the 2482 test images: 78.9283 %
+Accuracy of ADVE : 93.0769 %
+Accuracy of Email : 91.3828 %
+Accuracy of Form : 76.1329 %
+Accuracy of Letter : 84.3683 %
+Accuracy of Memo : 74.0385 %
+Accuracy of News : 95.4545 %
+Accuracy of Note : 82.1782 %
+Accuracy of Report : 40.0000 %
+Accuracy of Resume : 75.0000 %
+Accuracy of Scientific : 63.9752 %
+
+resnet:
+Accuracy of the network on the 2482 test images: 73.3280 %
+Accuracy of ADVE : 79.2308 %
+Accuracy of Email : 90.1804 %
+Accuracy of Form : 92.1450 %
+Accuracy of Letter : 47.3233 %
+Accuracy of Memo : 72.3077 %
+Accuracy of News : 96.5909 %
+Accuracy of Note : 77.2277 %
+Accuracy of Report : 66.0606 %
+Accuracy of Resume : 75.0000 %
+Accuracy of Scientific : 48.4472 %
+
+
+Average accuracy on 12410 test images in 5 number of runs: 76.3255 %
+Total correct: 9472 | Total number of images: 12410
