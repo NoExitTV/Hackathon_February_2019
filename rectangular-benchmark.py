@@ -300,7 +300,7 @@ for model_name in models_list:
     model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=False)
 
     # Print the model we just instantiated
-    print(model_ft)
+    # print(model_ft)
     print("\nRun number: {} / {}\n".format(run_numb, len(models_list)))
     run_numb += 1
 
@@ -313,17 +313,17 @@ for model_name in models_list:
     #  that we have just initialized, i.e. the parameters with requires_grad
     #  is True.
     params_to_update = model_ft.parameters()
-    print("Params to learn:")
+    # print("Params to learn:")
     if feature_extract:
         params_to_update = []
         for name,param in model_ft.named_parameters():
             if param.requires_grad == True:
                 params_to_update.append(param)
-                print("\t",name)
+                # print("\t",name)
     else:
         for name,param in model_ft.named_parameters():
             if param.requires_grad == True:
-                print("\t",name)
+                # print("\t",name)
 
     # Observe that all parameters are being optimized
     optimizer_ft = optim.Adam(params_to_update, lr=learning_rate)
