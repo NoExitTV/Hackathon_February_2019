@@ -75,7 +75,7 @@ def initialize_model(model_name, num_classes, feature_extract, saved_model_path)
         """ Pretrained resnet
         """
         model_ft = models.resnet18(pretrained=False)
-        model_ft.load_state_dict(saved_model_path)
+        model_ft.load_state_dict(torch.load(saved_model_path))
         model_ft.eval()
 
         # num_ftrs = model_ft.fc.in_features
