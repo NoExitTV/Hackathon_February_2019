@@ -152,6 +152,7 @@ if torch.cuda.is_available():
     print("torch.cuda.device_count()", torch.cuda.device_count())
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
+batch_size = 16 # Minibatch size
 num_classes = 10
 best_resnet_model_path = "./saved-models/resnet-rectangular-80images-best.pth"
 
