@@ -218,7 +218,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     return model_ft, input_size
 
 def load_data(input_size, batch_size):
-    target_resolution = (480, 340)
+    target_resolution = (480, 640)
 
     print("Initializing Datasets and Dataloaders...")
 
