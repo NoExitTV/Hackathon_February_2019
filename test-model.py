@@ -190,10 +190,6 @@ for model_name in models_list:
     # Send the model to device (hopefully GPU :))
     model_ft = model_ft.to(device)
 
-    # Load model
-    model_ft.load_state_dict()
-    model_ft.eval()
-
     # Test
     correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
 
