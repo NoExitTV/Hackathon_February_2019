@@ -1,0 +1,11 @@
+Accuracy of the network on the 2482 test images: 81.5471
+Accuracy of ADVE : 95.1220
+Accuracy of Email : 94.2492
+Accuracy of Form : 89.7561
+Accuracy of Letter : 76.4505
+Accuracy of Memo : 82.8746
+Accuracy of News : 96.2264
+Accuracy of Note : 61.5385
+Accuracy of Report : 53.9216
+Accuracy of Resume : 72.7273
+Accuracy of Scientific : 57.4257

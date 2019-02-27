@@ -25,17 +25,17 @@ model_ft.fc = nn.Sequential(
 
 ### Results: ###
 resnet:
-Accuracy of the network on the 2482 test images: 78.3239
-Accuracy of ADVE : 87.8049
-Accuracy of Email : 89.1374
-Accuracy of Form : 80.0000
-Accuracy of Letter : 83.2765
-Accuracy of Memo : 73.0887
-Accuracy of News : 100.0000
-Accuracy of Note : 75.3846
-Accuracy of Report : 49.0196
-Accuracy of Resume : 63.6364
-Accuracy of Scientific : 47.5248
+Accuracy of the network on the 699 test images: 78.8269
+Accuracy of ADVE : 93.3333
+Accuracy of Email : 92.1053
+Accuracy of Form : 92.5926
+Accuracy of Letter : 48.5714
+Accuracy of Memo : 81.2500
+Accuracy of News : 90.0000
+Accuracy of Note : 82.1429
+Accuracy of Report : 62.5000
+Accuracy of Resume : 100.0000
+Accuracy of Scientific : 70.5882
 
 ### Other info ###
 Tested on the splitted dataset test and not the original test split in the dataset...
