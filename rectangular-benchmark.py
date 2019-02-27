@@ -341,7 +341,10 @@ def load_data(input_size, batch_size):
                                             batch_size=batch_size,
                                             shuffle=False)
     
-    print("Classes: ", classes)
+    try:
+        print("Classes: ", tobacco.classes)
+    except:
+        print("COULD NOT PRINT tobacco.classes")
 
     return train_loader, val_loader, test_loader, tobacco_train.classes   
 
