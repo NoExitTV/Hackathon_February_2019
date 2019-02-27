@@ -542,6 +542,8 @@ for split_num in range(number_of_different_splits):
 # Print results and calculate average
 total = 0
 total_correct = 0
+print()
+print("Testing done! Calculating results...")
 for m in results:
 
     total += m['total']
