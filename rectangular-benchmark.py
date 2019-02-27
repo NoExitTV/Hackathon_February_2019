@@ -19,8 +19,9 @@ print("Torchvision Version: ",torchvision.__version__)
 
 #%%
 ########## Helper functions ##########
-def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_inception=False):
-    
+def train_model(model, dataloaders, criterion, optimizer, num_epochs=25):
+    ''' Train the model and then load the weights that gave the best validation results '''
+
     print("Training on device: ", device)
 
     since = time.time()
@@ -55,19 +56,9 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
                 # forward
                 # track history if only in train
                 with torch.set_grad_enabled(phase == 'train'):
-                    # Get model outputs and calculate loss
-                    # Special case for inception because in training it has an auxiliary output. In train
-                    #   mode we calculate the loss by summing the final output and the auxiliary output
-                    #   but in testing we only consider the final output.
-                    if is_inception and phase == 'train':
-                        # From https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958
-                        outputs, aux_outputs = model(inputs)
-                        loss1 = criterion(outputs, labels)
-                        loss2 = criterion(aux_outputs, labels)
-                        loss = loss1 + 0.4*loss2
-                    else:
-                        outputs = model(inputs)
-                        loss = criterion(outputs, labels)
+                    
+                    outputs = model(inputs)
+                    loss = criterion(outputs, labels)
 
                     _, preds = torch.max(outputs, 1)
 
@@ -89,7 +80,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
-            if phase == 'test':
+            if phase == 'val':
                 val_acc_history.append(epoch_acc)
 
         print()
@@ -101,6 +92,59 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
     # load best model weights
     model.load_state_dict(best_model_wts)
     return model, val_acc_history
+
+def train_model_without_val(model, dataloaders, criterion, optimizer, num_epochs=25):
+    ''' In this function we do the same training as train_model but we do not load the weights that gave the best validation accuracy.
+        This is the training function that should be ran on the full 100 test images per class (without validation) '''
+    
+    print("Training on device: ", device)
+
+    since = time.time()
+
+    for epoch in range(num_epochs):
+        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        print('-' * 10)
+
+        model.train()  # Set model to training mode
+
+        running_loss = 0.0
+        running_corrects = 0
+
+        # Iterate over data.
+        for inputs, labels in dataloaders['train']:
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+
+            # zero the parameter gradients
+            optimizer.zero_grad()
+
+            # forward
+            # track history if only in train
+            with torch.set_grad_enabled(True):
+                
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+
+                _, preds = torch.max(outputs, 1)
+
+                loss.backward()
+                optimizer.step()   
+
+            # statistics
+            running_loss += loss.item() * inputs.size(0)
+            running_corrects += torch.sum(preds == labels.data)
+
+        epoch_loss = running_loss / len(dataloaders['train'].dataset)
+        epoch_acc = running_corrects.double() / len(dataloaders['train'].dataset)
+
+        print('{} Loss: {:.4f} Acc: {:.4f}'.format('train', epoch_loss, epoch_acc))
+
+        print()
+
+    time_elapsed = time.time() - since
+    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+
+    return model, [] # Return empty val_acc_history here...
 
 def test_model(model, dataloaders, classes):
     print("Testing on device: ", device)
@@ -235,7 +279,7 @@ def load_data(input_size, batch_size):
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
-    tobacco_train = datasets.ImageFolder("datasets/Tobacco_split/train",
+    tobacco_train = datasets.ImageFolder("datasets/Tobacco_merged/train+val",
                                         transform=transform_train)
 
     tobacco_val = datasets.ImageFolder("datasets/Tobacco_split/val",
@@ -284,7 +328,7 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["resnet" for i in range(5)]  # Run the same model and calc average
+models_list = ["resnet" for i in range(5)]  # Run the same model 5 times and calc average
 results = []
 
 train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
@@ -335,7 +379,8 @@ for model_name in models_list:
     criterion = nn.CrossEntropyLoss()
 
     # Train and evaluate
-    model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
+    # model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs)
+    model_ft, hist = train_model_without_val(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs)
 
     # Save model
     torch.save(model_ft.state_dict(), "./saved-models/" + model_name + "-rectangular.pth")
