@@ -316,17 +316,17 @@ def load_data(input_size, batch_size):
     #
     ''' Use this only if you want to load the entire dataset and create a random train/val/test split '''
     
-    tobacco_train = Tobacco("datasets/Tobacco_all/all",
-                            transform=transform_train)
+    tobacco_train2 = Tobacco("datasets/Tobacco_all/all",
+                            preprocess=transform_train)
     tobacco_val = Tobacco("datasets/Tobacco_all/all",
-                            transform=transform_val)
+                            preprocess=transform_val)
     tobacco_test = Tobacco("datasets/Tobacco_all/all", 
-                            transform=transform_test)
+                            preprocess=transform_test)
     
     # Load N number of datasets in train dataset
-    tobacco_train.load_split("train")
-    print("Tobacco train len: ", len(tobacco_train))
-    train_loader = torch.utils.data.DataLoader(dataset=tobacco_train,
+    tobacco_train2.load_split("train")
+    print("Tobacco train len: ", len(tobacco_train2))
+    train_loader = torch.utils.data.DataLoader(dataset=tobacco_train2,
                                             batch_size=batch_size,
                                             shuffle=True,
                                             num_workers=8)
