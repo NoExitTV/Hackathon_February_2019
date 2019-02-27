@@ -343,7 +343,7 @@ def load_data(input_size, batch_size, append_path=None):
     # Get path of where to load dataset
     path = "datasets/Tobacco_test"
     if append_path is not None:
-        path += "/" + append_path
+        path = path + "/" + append_path
 
     print("Loading dataset from path {}".format(path))
 
