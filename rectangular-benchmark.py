@@ -316,28 +316,30 @@ def load_data(input_size, batch_size):
     #
     ''' Use this only if you want to load the entire dataset and create a random train/val/test split '''
     
-    tobacco = Tobacco("datasets/Tobacco_all/all")
+    tobacco_train = Tobacco("datasets/Tobacco_all/all", preprocess=transform_train)
+    tobacco_val = Tobacco("datasets/Tobacco_all/all", preprocess=transform_val)
+    tobacco_test = Tobacco("datasets/Tobacco_all/all", preprocess=transform_test)
     
     # Load N number of datasets in train dataset
-    tobacco.load_split("train")
-    print("Tobacco train len: ", len(tobacco))
-    train_loader = torch.utils.data.DataLoader(dataset=tobacco,
+    tobacco_train.load_split("train")
+    print("Tobacco train len: ", len(tobacco_train))
+    train_loader = torch.utils.data.DataLoader(dataset=tobacco_train,
                                             batch_size=batch_size,
                                             shuffle=True,
                                             num_workers=8)
 
     # Load n number of datasets into val dataset
-    tobacco.load_split("val")
-    print("Tobacco val len: ", len(tobacco))
-    val_loader = torch.utils.data.DataLoader(dataset=tobacco,
+    tobacco_val.load_split("val")
+    print("Tobacco val len: ", len(tobacco_val))
+    val_loader = torch.utils.data.DataLoader(dataset=tobacco_val,
                                             batch_size=batch_size,
                                             shuffle=False,
                                             num_workers=8)
 
     # Load N number of datasets into test dataset
-    tobacco.load_split("test")
-    print("Tobacco test len: ", len(tobacco))
-    test_loader = torch.utils.data.DataLoader(dataset=tobacco,
+    tobacco_test.load_split("test")
+    print("Tobacco test len: ", len(tobacco_test))
+    test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
                                             batch_size=batch_size,
                                             shuffle=False)
     
