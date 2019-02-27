@@ -342,8 +342,10 @@ def load_data(input_size, batch_size):
                                             shuffle=False)
     
     # DEBUG
+    print(train_loader)
+    print(len(train_loader))
     i = 0
-    for inputs, labels in tobacco:
+    for inputs, labels in train_loader:
         i += 1
         print(inputs.shape)
         print(labels.shape)
