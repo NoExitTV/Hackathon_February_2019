@@ -15,6 +15,7 @@ from vgg import VGG, vgg13
 from dataset import Tobacco
 import os
 from shutil import copy as copy2
+from shutil import rmtree
 
 print("PyTorch Version: ",torch.__version__)
 print("Torchvision Version: ",torchvision.__version__)
@@ -260,9 +261,9 @@ def create_dataset_splits():
     ROOT = "datasets/Tobacco_test/"
 
     # First, remove everything in root
-    os.rmdir(ROOT + "test")
-    os.rmdir(ROOT + "train")
-    os.rmdir(ROOT + "val")
+    rmtree(ROOT + "test")
+    rmtree(ROOT + "train")
+    rmtree(ROOT + "val")
     print("Removed test, train, val dirs!")
 
     def check_and_make_dir(set_name, classes):
