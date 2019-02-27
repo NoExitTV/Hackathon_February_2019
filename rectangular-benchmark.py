@@ -24,7 +24,7 @@ print("Torchvision Version: ",torchvision.__version__)
 #%%
 ########## Helper functions ##########
 
-def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, execution_number, total_runs):
+def train_model(model, dataloaders, criterion, optimizer, execution_number, total_runs, num_epochs=25):
     ''' Train the model and then load the weights that gave the best validation results '''
 
     print("Training on device: {}".format(device))
@@ -102,7 +102,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, executi
     model.load_state_dict(best_model_wts)
     return model, val_acc_history
 
-def train_model_without_val(model, dataloaders, criterion, optimizer, num_epochs=25, execution_number, total_runs):
+def train_model_without_val(model, dataloaders, criterion, optimizer, execution_number, total_runs, num_epochs=25):
     ''' In this function we do the same training as train_model but we do not load the weights that gave the best validation accuracy.
         This is the training function that should be ran on the full 100 test images per class (without validation) '''
     
@@ -511,7 +511,7 @@ for split_num in range(number_of_different_splits):
         criterion = nn.CrossEntropyLoss()
 
         # Train and evaluate
-        model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, execution_number, total_runs)
+        model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, execution_number, total_runs, num_epochs=num_epochs)
 
         # Save model
         torch.save(model_ft.state_dict(), "./saved-models/" + model_name + "-rectangular.pth")
