@@ -414,7 +414,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 16 # Minibatch size
-num_epochs = 2
+num_epochs = 100
 learning_rate = 0.5e-3
 num_classes = 10
 number_of_different_splits = 3
@@ -529,5 +529,5 @@ for m in results:
 
 # Print average accuracy
 print("\n")
-print('Average accuracy on ' + str(total) + ' test images in ' +  str(len(models_list)) + ' number of runs: {:.4f} %'.format(100.0 * total_correct / total))
+print('Average accuracy on ' + str(total) + ' test images in ' +  str(len(models_list) * number_of_different_splits) + ' number of runs: {:.4f} %'.format(100.0 * total_correct / total))
 print("Total correct: {} | Total number of images: {}".format(total_correct, total))
