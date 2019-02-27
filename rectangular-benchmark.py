@@ -14,7 +14,7 @@ from alexnet import AlexNet
 from vgg import VGG, vgg13
 from dataset import Tobacco
 import os
-from shutil import copy
+from shutil import copy as copy2
 
 print("PyTorch Version: ",torch.__version__)
 print("Torchvision Version: ",torchvision.__version__)
@@ -282,7 +282,7 @@ def create_dataset_splits():
         dir_path = ROOT + phase + "/"
         for i in t.splits[0][phase]:
             dest = dir_path + CLASSES[i[1]] + "/"
-            copy(i[0], dest)
+            copy2(i[0], dest)
             print("copied %s to %s" % (i[0], dest))
         
 
