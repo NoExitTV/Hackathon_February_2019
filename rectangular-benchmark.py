@@ -320,7 +320,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 16 # Minibatch size
-num_epochs = 75
+num_epochs = 20
 learning_rate = 0.5e-3
 num_classes = 10
 
@@ -328,7 +328,8 @@ num_classes = 10
 #%%
 ########## Run tests ##########
 
-models_list = ["resnet" for i in range(5)]  # Run the same model 5 times and calc average
+# models_list = ["resnet" for i in range(5)]  # Run the same model 5 times and calc average
+models_list = ["vgg"]
 results = []
 
 train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
@@ -339,7 +340,7 @@ for model_name in models_list:
 
     # Flag for feature extracting. When False, we finetune the whole model,
     #   when True we only update the reshaped layer params
-    feature_extract = False
+    feature_extract = True
 
     # Initialize the model for this run
     model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=False)
@@ -366,11 +367,11 @@ for model_name in models_list:
         for name,param in model_ft.named_parameters():
             if param.requires_grad == True:
                 params_to_update.append(param)
-                # print("\t",name)
-    # else:
-    #     for name,param in model_ft.named_parameters():
-    #         if param.requires_grad == True:
-    #             rint("\t",name)
+                print("\t",name)
+    else:
+        for name,param in model_ft.named_parameters():
+            if param.requires_grad == True:
+                print("\t",name)
 
     # Observe that all parameters are being optimized
     optimizer_ft = optim.Adam(params_to_update, lr=learning_rate)
