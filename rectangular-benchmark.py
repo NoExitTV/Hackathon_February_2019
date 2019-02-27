@@ -331,7 +331,7 @@ def load_data(input_size, batch_size):
     print("Tobacco val len: ", len(tobacco))
     val_loader = torch.utils.data.DataLoader(dataset=tobacco,
                                             batch_size=batch_size,
-                                             shuffle=False,
+                                            shuffle=False,
                                             num_workers=8)
 
     # Load N number of datasets into test dataset
@@ -341,10 +341,15 @@ def load_data(input_size, batch_size):
                                             batch_size=batch_size,
                                             shuffle=False)
     
-    try:
-        print("Classes: ", tobacco.classes)
-    except:
-        print("COULD NOT PRINT tobacco.classes")
+    # DEBUG
+    i = 0
+    for inputs, labels in train_loader:
+        i += 1
+        print(inputs.shape)
+        print(labels.shape)
+        if i > 10:
+            break
+
 
     return train_loader, val_loader, test_loader, tobacco_train.classes   
 
