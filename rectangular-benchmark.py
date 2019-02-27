@@ -316,8 +316,14 @@ def load_data(input_size, batch_size):
     #
     ''' Use this only if you want to load the entire dataset and create a random train/val/test split '''
     
+    transform_train_tobacco = [torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+                                transforms.RandomHorizontalFlip(),
+                                torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
+                                torchvision.transforms.ToTensor(),
+                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+
     tobacco_train2 = Tobacco("datasets/Tobacco_all/all",
-                            preprocess=transform_train)
+                            preprocess=transform_train_tobacco)
     tobacco_val = Tobacco("datasets/Tobacco_all/all",
                             preprocess=transform_val)
     tobacco_test = Tobacco("datasets/Tobacco_all/all", 
