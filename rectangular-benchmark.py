@@ -284,8 +284,8 @@ def load_data(input_size, batch_size):
     # Load static dataset
     #
     ''' Uncomment the below lines to load a static dataset saved on disk '''
-    # tobacco_train = datasets.ImageFolder("datasets/Tobacco_split/train",
-    #                                     transform=transform_train)
+    tobacco_train = datasets.ImageFolder("datasets/Tobacco_split/train",
+                                        transform=transform_train)
     # tobacco_val = datasets.ImageFolder("datasets/Tobacco_split/val",
     #                                     transform=transform_val)
 
@@ -340,10 +340,9 @@ def load_data(input_size, batch_size):
                                             batch_size=batch_size,
                                             shuffle=False)
     
-    classes = tobacco.classes
     print("Classes: ", classes)
 
-    return train_loader, val_loader, test_loader, classes   
+    return train_loader, val_loader, test_loader, tobacco_train.classes   
 
 
 #%%
