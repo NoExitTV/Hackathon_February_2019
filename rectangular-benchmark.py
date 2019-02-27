@@ -23,10 +23,11 @@ print("Torchvision Version: ",torchvision.__version__)
 
 #%%
 ########## Helper functions ##########
-def train_model(model, dataloaders, criterion, optimizer, num_epochs=25):
+
+def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, execution_number, total_runs):
     ''' Train the model and then load the weights that gave the best validation results '''
 
-    print("Training on device: ", device)
+    print("Training on device: {}".format(device))
 
     since = time.time()
 
@@ -34,9 +35,11 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25):
 
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
+    best_epoch = 0
 
     for epoch in range(num_epochs):
-        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        time_elapsed = time.time() - since
+        print('Epoch {}/{} [Duration: {:.0f}m {:.0f}s] [Run: {}/{}]'.format(epoch, num_epochs - 1, time_elapsed // 60, time_elapsed % 60, execution_number, total_runs))
         print('-' * 10)
 
         # Each epoch has a training and validation phase
@@ -79,10 +82,12 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25):
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
 
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
+            print('Best val Acc: {:4f} in Epoch: {:.0f}'.format(best_acc, best_epoch))
 
             # deep copy the model
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
+                best_epoch = epoch
                 best_model_wts = copy.deepcopy(model.state_dict())
             if phase == 'val':
                 val_acc_history.append(epoch_acc)
@@ -91,22 +96,22 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25):
 
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-    print('Best val Acc: {:4f}'.format(best_acc))
+    print('Best val Acc: {:4f} in Epoch: {:.0f}'.format(best_acc, best_epoch))
 
     # load best model weights
     model.load_state_dict(best_model_wts)
     return model, val_acc_history
 
-def train_model_without_val(model, dataloaders, criterion, optimizer, num_epochs=25):
+def train_model_without_val(model, dataloaders, criterion, optimizer, num_epochs=25, execution_number, total_runs):
     ''' In this function we do the same training as train_model but we do not load the weights that gave the best validation accuracy.
         This is the training function that should be ran on the full 100 test images per class (without validation) '''
     
-    print("Training on device: ", device)
+    print("Training on device: {}".format(device))
 
     since = time.time()
 
     for epoch in range(num_epochs):
-        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        print('Epoch {}/{} [Duration: {:.0f}m {:.0f}s] [Run: {}/{}]'.format(epoch, num_epochs - 1, time_elapsed // 60, time_elapsed % 60, execution_number, total_runs))
         print('-' * 10)
 
         model.train()  # Set model to training mode
@@ -150,8 +155,8 @@ def train_model_without_val(model, dataloaders, criterion, optimizer, num_epochs
 
     return model, [] # Return empty val_acc_history here...
 
-def test_model(model, dataloaders, classes):
-    print("Testing on device: ", device)
+def test_model(model, dataloaders, classes, execution_number, total_runs):
+    print("Testing on device: {}".format(device))
     with torch.no_grad():
         since = time.time()
 
@@ -183,13 +188,14 @@ def test_model(model, dataloaders, classes):
                     
 
         time_elapsed = time.time() - since
-        print('Testing complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-
-        print('Accuracy of the network on the ' + str(total) + ' test images: {:.4f} %'.format(100.0 * correct / total))
+        print('Testing complete in {:.0f}m {:.0f}s [Run: {}/{}]'.format(time_elapsed // 60, time_elapsed % 60, execution_number, total_runs))
+        print('Accuracy of the network on the {} test images: {:.4f} %'.format(total, 100.0 * correct / total))
             
         for i in range(10):
             print('Accuracy of {} : {:.4f} %'.format(classes[i], 100.0 * class_correct[i] / class_total[i]))        
         
+        print()
+
         return correct, total, class_correct, class_total
 
 def set_parameter_requires_grad(model, feature_extracting):
@@ -212,15 +218,16 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Fa
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
         set_parameter_requires_grad(model_ft, feature_extract)
+        
         # num_ftrs = model_ft.fc.in_features
         # model_ft.fc = nn.Linear(64512, num_classes)
         
         # Change last fc layer
         model_ft.fc = nn.Sequential(
-            nn.Dropout(p=0.5),
+            nn.Dropout(p=0.1),
             nn.Linear(64512, 4096),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
+            #nn.ReLU(),
+            #nn.Dropout(p=0.5),
             nn.Linear(4096, num_classes)
         ) 
 
@@ -256,15 +263,26 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Fa
 
     return model_ft, input_size
 
-def create_dataset_splits(r):
-    CLASSES = ("ADVE", "Email", "Form", "Letter", "Memo", "News", "Note", "Report", "Resume", "Scientific")
-    ROOT = "datasets/Tobacco_test/"
+def create_dataset_splits(seed=1337, append_path="NaN"):
 
-    # First, remove everything in root
-    rmtree(ROOT + "test")
-    rmtree(ROOT + "train")
-    rmtree(ROOT + "val")
-    print("Removed test, train, val dirs!")
+    CLASSES = ("ADVE", "Email", "Form", "Letter", "Memo", "News", "Note", "Report", "Resume", "Scientific")
+    ROOT = "datasets/Tobacco_test/" + append_path + "/"
+
+    print("Creating new dataset with seed: {} at: {}".format(seed, ROOT))
+
+    # First, remove everything if folders already exist!
+    if os.path.exists(ROOT + "test"):
+        rmtree(ROOT + "test")
+        print("Removed dir {}".format(ROOT + "test"))
+    
+    if os.path.exists(ROOT + "train"):
+        rmtree(ROOT + "train")
+        print("Removed dir {}".format(ROOT + "train"))
+
+    if os.path.exists(ROOT + "val"):
+        rmtree(ROOT + "val")
+        print("Removed dir {}".format(ROOT + "val"))
+
 
     def check_and_make_dir(set_name, classes):
         dirs = list(map(lambda x: ROOT + set_name + "/" + x, classes))
@@ -272,8 +290,11 @@ def create_dataset_splits(r):
             if not os.path.exists(dir):
                 os.makedirs(dir)
 
-    t = Tobacco("datasets/Tobacco_all/all", num_splits=1, random_state=r)
-
+    t = Tobacco("datasets/Tobacco_all/all", num_splits=1, random_state=seed)
+    
+    # Verify seed
+    print("Tobacco random state: {}".format(t.random_state))
+    
     phases = ['train', 'val', 'test']
     for phase in phases:
         check_and_make_dir(phase, CLASSES)
@@ -284,8 +305,7 @@ def create_dataset_splits(r):
         for i in t.splits[0][phase]:
             dest = dir_path + CLASSES[i[1]] + "/"
             copy2(i[0], dest)
-            #print("copied %s to %s" % (i[0], dest))
-        print("Done copying "+ phase + "!")
+        print("Done copying {} to {}".format(phase, ROOT))
         
 
 def load_data(input_size, batch_size):
@@ -316,12 +336,13 @@ def load_data(input_size, batch_size):
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     #
-    # Load static dataset
+    # Load dataset
     #
-    ''' Uncomment the below lines to load a static dataset saved on disk '''
+    ''' Uncomment the below lines to load a dataset saved on disk '''
 
     tobacco_train = datasets.ImageFolder("datasets/Tobacco_test/train",
                                         transform=transform_train)
+
     tobacco_val = datasets.ImageFolder("datasets/Tobacco_test/val",
                                         transform=transform_val)
 
@@ -407,14 +428,14 @@ def load_data(input_size, batch_size):
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 if torch.cuda.is_available():
-    print("Running on device: ", device)
-    print("torch.cuda.current_device()", torch.cuda.current_device())
-    print("torch.cuda.device(0)", torch.cuda.device(0))
-    print("torch.cuda.device_count()", torch.cuda.device_count())
-    print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
+    print("Running on device: {}".format(device))
+    print("torch.cuda.current_device(): {}".format(torch.cuda.current_device()))
+    print("torch.cuda.device(0): {}".format(torch.cuda.device(0)))
+    print("torch.cuda.device_count(): {}".format(torch.cuda.device_count()))
+    print("torch.cuda.get_device_name(0): {}".format(torch.cuda.get_device_name(0)))
 
 batch_size = 16 # Minibatch size
-num_epochs = 100
+num_epochs = 2
 learning_rate = 0.5e-3
 num_classes = 10
 number_of_different_splits = 3
@@ -425,6 +446,7 @@ number_of_different_splits = 3
 # models_list = ["resnet" for i in range(5)]  # Run the same model 5 times and calc average
 models_list = ["resnet"]
 results = []
+t0 = time.time()
 
 #
 # First we iterate over i which is on how many splits we want to test or model on
@@ -432,16 +454,23 @@ results = []
 # just add the same model name multiple times into the 'models_list'
 #
 
-for i in range(number_of_different_splits):
+for split_num in range(number_of_different_splits):
     
-    print("Creating new dataset splits")
-    create_dataset_splits(1337+i)
+    # Create new dataset (different seed) and save it to disk
+    create_dataset_splits(seed=1337+split_num, append_path=str(split_num))
 
+    # Initialize data loaders and save in dict
     train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
-    run_numb = 1 # Keep track of the number of runs we've been doing
+    model_num = 0 # Keep track of the number of runs we've been doing
     for model_name in models_list:
+
+        total_runs = number_of_different_splits * len(models_list)
+        model_num += 1
+
+        # Keep track of this so we can plot stuff
+        execution_number = (split_num + 1) * model_num
 
         # Flag for feature extracting. When False, we finetune the whole model,
         #   when True we only update the reshaped layer params
@@ -451,11 +480,8 @@ for i in range(number_of_different_splits):
         model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=False)
 
         # Print the model we just instantiated
-        if run_numb == 1:
+        if execution_number == 1:
             print(model_ft)
-            
-        print("\nRun number: {} / {}\n".format(run_numb, len(models_list)))
-        run_numb += 1
 
         # Send the model to device (hopefully GPU :))
         model_ft = model_ft.to(device)
@@ -485,13 +511,13 @@ for i in range(number_of_different_splits):
         criterion = nn.CrossEntropyLoss()
 
         # Train and evaluate
-        model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs)
+        model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, execution_number, total_runs)
 
         # Save model
         torch.save(model_ft.state_dict(), "./saved-models/" + model_name + "-rectangular.pth")
 
         # Test
-        correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
+        correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes, execution_number, total_runs)
 
         # Add model results
         results.append({'model_name': model_name, 
@@ -522,12 +548,16 @@ for m in results:
     total_correct += m['correct']
 
     print(m['model_name']+":")
-    print('Accuracy of the network on the ' + str(m['total']) + ' test images: {:.4f} %'.format(100.0 * m['correct'] / m['total']))
+    print('Accuracy of the network on the {} test images: {:.4f} %'.format(m['total'], 100.0 * m['correct'] / m['total']))
 
     for i in range(10):
         print('Accuracy of {} : {:.4f} %'.format(m['classes'][i], 100.0 * m['class_correct'][i] / m['class_total'][i]))        
+    
+    print()
 
 # Print average accuracy
+time_elapsed = time.time() - t0
 print("\n")
-print('Average accuracy on ' + str(total) + ' test images in ' +  str(len(models_list) * number_of_different_splits) + ' number of runs: {:.4f} %'.format(100.0 * total_correct / total))
-print("Total correct: {} | Total number of images: {}".format(total_correct, total))
+print('Average accuracy on {} test images in {} number of runs: {:.4f} %'.format(total, number_of_different_splits * len(models_list), 100.0 * total_correct / total))
+print("Total correct: {}, Total number of images: {}".format(total_correct, total))
+print('Total runtime: {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))

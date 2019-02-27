@@ -1,0 +1,69 @@
+### Hyperparameters:###
+    batch_size = 16 # Minibatch size
+    num_epochs = 100
+    learning_rate = 0.5e-3
+    num_classes = 10
+    number_of_different_splits = 3
+
+### Transforms: ###
+    target_resolution = (480, 640)
+    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
+                                                torchvision.transforms.RandomCrop(target_resolution)])
+
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+                                            transforms.RandomHorizontalFlip(),
+                                            torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
+                                            #torchvision.transforms.RandomVerticalFlip(),
+                                            torchvision.transforms.ToTensor(),
+                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+### Layer modifications:###
+    model_ft.fc = nn.Sequential(
+                nn.Dropout(p=0.5),
+                nn.Linear(64512, 4096),
+                nn.ReLU(),
+                nn.Dropout(p=0.5),
+                nn.Linear(4096, num_classes)
+            )
+
+resnet:
+Accuracy of the network on the 2482 test images: 76.5109 %
+Accuracy of ADVE : 96.1538 %
+Accuracy of Email : 89.5792 %
+Accuracy of Form : 70.3927 %
+Accuracy of Letter : 63.3833 %
+Accuracy of Memo : 85.9615 %
+Accuracy of News : 88.6364 %
+Accuracy of Note : 83.1683 %
+Accuracy of Report : 62.4242 %
+Accuracy of Resume : 70.0000 %
+Accuracy of Scientific : 44.7205 %
+
+resnet:
+Accuracy of the network on the 2482 test images: 76.5109 %
+Accuracy of ADVE : 96.1538 %
+Accuracy of Email : 92.7856 %
+Accuracy of Form : 75.8308 %
+Accuracy of Letter : 76.8737 %
+Accuracy of Memo : 66.1538 %
+Accuracy of News : 94.3182 %
+Accuracy of Note : 87.1287 %
+Accuracy of Report : 58.1818 %
+Accuracy of Resume : 90.0000 %
+Accuracy of Scientific : 44.7205 %
+
+resnet:
+Accuracy of the network on the 2482 test images: 76.3094 %
+Accuracy of ADVE : 91.5385 %
+Accuracy of Email : 94.9900 %
+Accuracy of Form : 82.4773 %
+Accuracy of Letter : 77.7302 %
+Accuracy of Memo : 65.1923 %
+Accuracy of News : 93.1818 %
+Accuracy of Note : 79.2079 %
+Accuracy of Report : 41.2121 %
+Accuracy of Resume : 75.0000 %
+Accuracy of Scientific : 50.3106 %
+
+Average accuracy on 7446 test images in 3 number of runs: 76.4437 %
+Total correct: 5692 | Total number of images: 7446
