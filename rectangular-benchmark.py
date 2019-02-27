@@ -280,33 +280,70 @@ def load_data(input_size, batch_size):
     transform_test = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    #
+    # Load static dataset
+    #
+    ''' Uncomment the below lines to load a static dataset saved on disk '''
+    # tobacco_train = datasets.ImageFolder("datasets/Tobacco_split/train",
+    #                                     transform=transform_train)
+    # tobacco_val = datasets.ImageFolder("datasets/Tobacco_split/val",
+    #                                     transform=transform_val)
+
+    # tobacco_test = datasets.ImageFolder("datasets/Tobacco_split/test",
+    #                                     transform=transform_test)
+
+    # # Load N number of datasets in train dataset
+    # train_loader = torch.utils.data.DataLoader(dataset=tobacco_train,
+    #                                         batch_size=batch_size,
+    #                                         shuffle=True,
+    #                                         num_workers=8)
+
+    # # Load n number of datasets into val dataset
+    # val_loader = torch.utils.data.DataLoader(dataset=tobacco_val,
+    #                                         batch_size=batch_size,
+    #                                         num_workers=8)
+
+    # # Load N number of datasets into test dataset
+    # test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
+    #                                         batch_size=batch_size,
+    #                                         shuffle=False)
+
+    # classes = tobacco_train.classes
+
+
+    #
+    # use Tobacco and create a random split!
+    #
+    ''' Use this only if you want to load the entire dataset and create a random train/val/test split '''
     
-    tobacco_train = datasets.ImageFolder("datasets/Tobacco_split/train",
-                                        transform=transform_train)
-
-    tobacco_val = datasets.ImageFolder("datasets/Tobacco_split/val",
-                                        transform=transform_val)
-
-    tobacco_test = datasets.ImageFolder("datasets/Tobacco_split/test",
-                                        transform=transform_test)
-
+    tobacco = Tobacco("datasets/Tobacco_all")
+    
     # Load N number of datasets in train dataset
-    train_loader = torch.utils.data.DataLoader(dataset=tobacco_train,
+    tobacco.load_split("train")
+    print("Tobacco train len: ", len(tobacco))
+    train_loader = torch.utils.data.DataLoader(dataset=tobacco,
                                             batch_size=batch_size,
                                             shuffle=True,
                                             num_workers=8)
 
     # Load n number of datasets into val dataset
-    val_loader = torch.utils.data.DataLoader(dataset=tobacco_val,
+    tobacco.load_split("val")
+    print("Tobacco val len: ", len(tobacco))
+    val_loader = torch.utils.data.DataLoader(dataset=tobacco,
                                             batch_size=batch_size,
                                             num_workers=8)
 
     # Load N number of datasets into test dataset
-    test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
+    tobacco.load_split("test")
+    print("Tobacco test len: ", len(tobacco))
+    test_loader = torch.utils.data.DataLoader(dataset=tobacco,
                                             batch_size=batch_size,
                                             shuffle=False)
+    
+    classes = tobacco.classes
+    print("Classes: ", classes)
 
-    return train_loader, val_loader, test_loader, tobacco_train.classes    
+    return train_loader, val_loader, test_loader, classes   
 
 
 #%%
@@ -322,10 +359,10 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 16 # Minibatch size
-num_epochs = 75
+num_epochs = 100
 learning_rate = 0.5e-3
 num_classes = 10
-
+number_of_different_splits = 3
 
 #%%
 ########## Run tests ##########
@@ -334,75 +371,89 @@ num_classes = 10
 models_list = ["resnet"]
 results = []
 
-train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
-dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
+#
+# First we iterate over i which is on how many splits we want to test or model on
+# We then run all models present in 'models_list'. To run the same model many times for each split,
+# just add the same model name multiple times into the 'models_list'
+#
 
-run_numb = 1 # Keep track of the number of runs we've been doing
-for model_name in models_list:
+for i in range(number_of_different_splits):
+    
+    train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
+    dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
-    # Flag for feature extracting. When False, we finetune the whole model,
-    #   when True we only update the reshaped layer params
-    feature_extract = False
+    run_numb = 1 # Keep track of the number of runs we've been doing
+    for model_name in models_list:
 
-    # Initialize the model for this run
-    model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=False)
+        # Flag for feature extracting. When False, we finetune the whole model,
+        #   when True we only update the reshaped layer params
+        feature_extract = False
 
-    # Print the model we just instantiated
-    if run_numb == 1:
-        print(model_ft)
-        
-    print("\nRun number: {} / {}\n".format(run_numb, len(models_list)))
-    run_numb += 1
+        # Initialize the model for this run
+        model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=False)
 
-    # Send the model to device (hopefully GPU :))
-    model_ft = model_ft.to(device)
+        # Print the model we just instantiated
+        if run_numb == 1:
+            print(model_ft)
+            
+        print("\nRun number: {} / {}\n".format(run_numb, len(models_list)))
+        run_numb += 1
 
-    # Gather the parameters to be optimized/updated in this run. If we are
-    #  finetuning we will be updating all parameters. However, if we are
-    #  doing feature extract method, we will only update the parameters
-    #  that we have just initialized, i.e. the parameters with requires_grad
-    #  is True.
-    params_to_update = model_ft.parameters()
-    print("Params to learn:")
-    if feature_extract:
-        params_to_update = []
-        for name,param in model_ft.named_parameters():
-            if param.requires_grad == True:
-                params_to_update.append(param)
-                print("\t",name)
-    else:
-        for name,param in model_ft.named_parameters():
-            if param.requires_grad == True:
-                print("\t",name)
+        # Send the model to device (hopefully GPU :))
+        model_ft = model_ft.to(device)
 
-    # Observe that all parameters are being optimized
-    optimizer_ft = optim.Adam(params_to_update, lr=learning_rate)
+        # Gather the parameters to be optimized/updated in this run. If we are
+        #  finetuning we will be updating all parameters. However, if we are
+        #  doing feature extract method, we will only update the parameters
+        #  that we have just initialized, i.e. the parameters with requires_grad
+        #  is True.
+        params_to_update = model_ft.parameters()
+        print("Params to learn:")
+        if feature_extract:
+            params_to_update = []
+            for name,param in model_ft.named_parameters():
+                if param.requires_grad == True:
+                    params_to_update.append(param)
+                    print("\t",name)
+        else:
+            for name,param in model_ft.named_parameters():
+                if param.requires_grad == True:
+                    print("\t",name)
 
-    # Setup the loss fxn
-    criterion = nn.CrossEntropyLoss()
+        # Observe that all parameters are being optimized
+        optimizer_ft = optim.Adam(params_to_update, lr=learning_rate) # We could try and implement a degrading learning rate!
 
-    # Train and evaluate
-    # model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs)
-    model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs)
+        # Setup the loss fxn
+        criterion = nn.CrossEntropyLoss()
 
-    # Save model
-    torch.save(model_ft.state_dict(), "./saved-models/" + model_name + "-rectangular.pth")
+        # Train and evaluate
+        model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs)
 
-    # Test
-    correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
+        # Save model
+        torch.save(model_ft.state_dict(), "./saved-models/" + model_name + "-rectangular.pth")
 
-    # Add model results
-    results.append({'model_name': model_name, 
-                    'hist': hist, 
-                    'correct': correct,
-                    'total': total,
-                    'class_correct': class_correct,
-                    'class_total': class_total,
-                    'classes': classes})
+        # Test
+        correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes)
 
-    # Some memory management!
-    del model_ft
-    torch.cuda.empty_cache()
+        # Add model results
+        results.append({'model_name': model_name, 
+                        'hist': hist, 
+                        'correct': correct,
+                        'total': total,
+                        'class_correct': class_correct,
+                        'class_total': class_total,
+                        'classes': classes})
+
+        # Some memory management!
+        del model_ft
+        torch.cuda.empty_cache()
+
+    # More memory management
+    del dataloaders_dict
+    del train_loader
+    del val_loader
+    del test_loader
+    del classes
 
 # Print results and calculate average
 total = 0
