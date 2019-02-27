@@ -372,7 +372,7 @@ def load_data(input_size, batch_size, append_path=None):
                                             batch_size=batch_size,
                                             shuffle=False)
 
-
+    #
     #
     # use Tobacco and create a random split!
     #
