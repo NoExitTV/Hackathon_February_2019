@@ -279,7 +279,7 @@ def load_data(input_size, batch_size):
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
-    tobacco_train = datasets.ImageFolder("datasets/Tobacco_merged/train+val",
+    tobacco_train = datasets.ImageFolder("datasets/Tobacco_split/train",
                                         transform=transform_train)
 
     tobacco_val = datasets.ImageFolder("datasets/Tobacco_split/val",
