@@ -329,7 +329,7 @@ num_classes = 10
 ########## Run tests ##########
 
 # models_list = ["resnet" for i in range(5)]  # Run the same model 5 times and calc average
-models_list = ["vgg"]
+models_list = ["resnet"]
 results = []
 
 train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
