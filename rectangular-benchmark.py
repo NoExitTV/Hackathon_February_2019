@@ -13,6 +13,8 @@ import copy
 from alexnet import AlexNet
 from vgg import VGG, vgg13
 from dataset import Tobacco
+import os
+from shutil import copy
 
 print("PyTorch Version: ",torch.__version__)
 print("Torchvision Version: ",torchvision.__version__)
@@ -253,6 +255,37 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Fa
 
     return model_ft, input_size
 
+def create_dataset_splits():
+    CLASSES = ("ADVE", "Email", "Form", "Letter", "Memo", "News", "Note", "Report", "Resume", "Scientific")
+    ROOT = "datasets/Tobacco_test"
+
+    # First, remove everything in root
+    os.rmdir(ROOT + "/test")
+    os.rmdir(ROOT + "/train")
+    os.rmdir(ROOT + "/val")
+    print("Removed test, train, val dirs!")
+
+    def check_and_make_dir(set_name, classes):
+        dirs = list(map(lambda x: ROOT + set_name + "/" + x, classes))
+        for dir in dirs:
+            if not os.path.exists(dir):
+                os.makedirs(dir)
+
+    t = Tobacco("datasets/Tobacco_all/all", num_splits=1)
+
+    phases = ['train', 'val', 'test']
+    for phase in phases:
+        check_and_make_dir(phase, CLASSES)
+        pass
+
+    for phase in phases:
+        dir_path = ROOT + phase + "/"
+        for i in t.splits[0][phase]:
+            dest = dir_path + CLASSES[i[1]] + "/"
+            copy(i[0], dest)
+            print("copied %s to %s" % (i[0], dest))
+        
+
 def load_data(input_size, batch_size):
     target_resolution = (480, 640)
 
@@ -284,31 +317,30 @@ def load_data(input_size, batch_size):
     # Load static dataset
     #
     ''' Uncomment the below lines to load a static dataset saved on disk '''
-    tobacco_train = datasets.ImageFolder("datasets/Tobacco_split/train",
+
+    tobacco_train = datasets.ImageFolder("datasets/Tobacco_test/train",
                                         transform=transform_train)
-    # tobacco_val = datasets.ImageFolder("datasets/Tobacco_split/val",
-    #                                     transform=transform_val)
+    tobacco_val = datasets.ImageFolder("datasets/Tobacco_test/val",
+                                        transform=transform_val)
 
-    # tobacco_test = datasets.ImageFolder("datasets/Tobacco_split/test",
-    #                                     transform=transform_test)
+    tobacco_test = datasets.ImageFolder("datasets/Tobacco_test/test",
+                                        transform=transform_test)
 
-    # # Load N number of datasets in train dataset
-    # train_loader = torch.utils.data.DataLoader(dataset=tobacco_train,
-    #                                         batch_size=batch_size,
-    #                                         shuffle=True,
-    #                                         num_workers=8)
+    # Load N number of datasets in train dataset
+    train_loader = torch.utils.data.DataLoader(dataset=tobacco_train,
+                                            batch_size=batch_size,
+                                            shuffle=True,
+                                            num_workers=8)
 
-    # # Load n number of datasets into val dataset
-    # val_loader = torch.utils.data.DataLoader(dataset=tobacco_val,
-    #                                         batch_size=batch_size,
-    #                                         num_workers=8)
+    # Load n number of datasets into val dataset
+    val_loader = torch.utils.data.DataLoader(dataset=tobacco_val,
+                                            batch_size=batch_size,
+                                            num_workers=8)
 
-    # # Load N number of datasets into test dataset
-    # test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
-    #                                         batch_size=batch_size,
-    #                                         shuffle=False)
-
-    # classes = tobacco_train.classes
+    # Load N number of datasets into test dataset
+    test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
+                                            batch_size=batch_size,
+                                            shuffle=False)
 
 
     #
@@ -316,52 +348,52 @@ def load_data(input_size, batch_size):
     #
     ''' Use this only if you want to load the entire dataset and create a random train/val/test split '''
     
-    transform_train_tobacco = [torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
-                                transforms.RandomHorizontalFlip(),
-                                torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
-                                torchvision.transforms.ToTensor(),
-                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+    # transform_train_tobacco = [torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+    #                             transforms.RandomHorizontalFlip(),
+    #                             torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
+    #                             torchvision.transforms.ToTensor(),
+    #                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
 
-    tobacco_train2 = Tobacco("datasets/Tobacco_all/all",
-                            preprocess=transform_train_tobacco)
-    tobacco_val = Tobacco("datasets/Tobacco_all/all",
-                            preprocess=transform_val)
-    tobacco_test = Tobacco("datasets/Tobacco_all/all", 
-                            preprocess=transform_test)
+    # tobacco_train2 = Tobacco("datasets/Tobacco_all/all",
+    #                         preprocess=transform_train_tobacco)
+    # tobacco_val = Tobacco("datasets/Tobacco_all/all",
+    #                         preprocess=transform_val)
+    # tobacco_test = Tobacco("datasets/Tobacco_all/all", 
+    #                         preprocess=transform_test)
     
-    # Load N number of datasets in train dataset
-    tobacco_train2.load_split("train")
-    print("Tobacco train len: ", len(tobacco_train2))
-    train_loader = torch.utils.data.DataLoader(dataset=tobacco_train2,
-                                            batch_size=batch_size,
-                                            shuffle=True,
-                                            num_workers=8)
+    # # Load N number of datasets in train dataset
+    # tobacco_train2.load_split("train")
+    # print("Tobacco train len: ", len(tobacco_train2))
+    # train_loader = torch.utils.data.DataLoader(dataset=tobacco_train2,
+    #                                         batch_size=batch_size,
+    #                                         shuffle=True,
+    #                                         num_workers=8)
 
-    # Load n number of datasets into val dataset
-    tobacco_val.load_split("val")
-    print("Tobacco val len: ", len(tobacco_val))
-    val_loader = torch.utils.data.DataLoader(dataset=tobacco_val,
-                                            batch_size=batch_size,
-                                            shuffle=False,
-                                            num_workers=8)
+    # # Load n number of datasets into val dataset
+    # tobacco_val.load_split("val")
+    # print("Tobacco val len: ", len(tobacco_val))
+    # val_loader = torch.utils.data.DataLoader(dataset=tobacco_val,
+    #                                         batch_size=batch_size,
+    #                                         shuffle=False,
+    #                                         num_workers=8)
 
-    # Load N number of datasets into test dataset
-    tobacco_test.load_split("test")
-    print("Tobacco test len: ", len(tobacco_test))
-    test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
-                                            batch_size=batch_size,
-                                            shuffle=False)
+    # # Load N number of datasets into test dataset
+    # tobacco_test.load_split("test")
+    # print("Tobacco test len: ", len(tobacco_test))
+    # test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
+    #                                         batch_size=batch_size,
+    #                                         shuffle=False)
     
-    # DEBUG
-    print(train_loader)
-    print(len(train_loader))
-    i = 0
-    for inputs, labels in train_loader:
-        i += 1
-        print(inputs.shape)
-        print(labels.shape)
-        if i > 10:
-            break
+    # # DEBUG
+    # print(train_loader)
+    # print(len(train_loader))
+    # i = 0
+    # for inputs, labels in train_loader:
+    #     i += 1
+    #     print(inputs.shape)
+    #     print(labels.shape)
+    #     if i > 10:
+    #         break
 
 
     return train_loader, val_loader, test_loader, tobacco_train.classes   
@@ -400,6 +432,9 @@ results = []
 
 for i in range(number_of_different_splits):
     
+    print("Creating new dataset splits")
+    create_dataset_splits()
+
     train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
