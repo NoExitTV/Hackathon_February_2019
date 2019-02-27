@@ -316,9 +316,12 @@ def load_data(input_size, batch_size):
     #
     ''' Use this only if you want to load the entire dataset and create a random train/val/test split '''
     
-    tobacco_train = Tobacco("datasets/Tobacco_all/all", preprocess=transform_train)
-    tobacco_val = Tobacco("datasets/Tobacco_all/all", preprocess=transform_val)
-    tobacco_test = Tobacco("datasets/Tobacco_all/all", preprocess=transform_test)
+    tobacco_train = Tobacco("datasets/Tobacco_all/all",
+                            transform=transform_train)
+    tobacco_val = Tobacco("datasets/Tobacco_all/all",
+                            transform=transform_val)
+    tobacco_test = Tobacco("datasets/Tobacco_all/all", 
+                            transform=transform_test)
     
     # Load N number of datasets in train dataset
     tobacco_train.load_split("train")
