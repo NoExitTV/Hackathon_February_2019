@@ -279,7 +279,7 @@ def load_data(input_size, batch_size):
                                             torchvision.transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
-    tobacco_train = datasets.ImageFolder("datasets/Tobacco_merged/train_and_val",
+    tobacco_train = datasets.ImageFolder("datasets/Tobacco_split/train",
                                         transform=transform_train)
 
     tobacco_val = datasets.ImageFolder("datasets/Tobacco_split/val",
@@ -381,7 +381,7 @@ for model_name in models_list:
 
     # Train and evaluate
     # model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs)
-    model_ft, hist = train_model_without_val(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs)
+    model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs)
 
     # Save model
     torch.save(model_ft.state_dict(), "./saved-models/" + model_name + "-rectangular.pth")
