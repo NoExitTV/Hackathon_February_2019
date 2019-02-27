@@ -229,7 +229,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Fa
             #nn.ReLU(),
             #nn.Dropout(p=0.5),
             nn.Linear(4096, num_classes)
-        ) 
+        )
 
     elif model_name == "alexnet":
         """ Pretrained alexnet
@@ -308,7 +308,7 @@ def create_dataset_splits(seed=1337, append_path="NaN"):
         print("Done copying {} to {}".format(phase, ROOT))
         
 
-def load_data(input_size, batch_size):
+def load_data(input_size, batch_size, append_path=None):
     target_resolution = (480, 640)
 
     print("Initializing Datasets and Dataloaders...")
@@ -340,13 +340,20 @@ def load_data(input_size, batch_size):
     #
     ''' Uncomment the below lines to load a dataset saved on disk '''
 
-    tobacco_train = datasets.ImageFolder("datasets/Tobacco_test/train",
+    # Get path of where to load dataset
+    path = "datasets/Tobacco_test"
+    if append_path is not None:
+        path += "/" + append_path
+
+    print("Loading dataset from path {}".format(path))
+
+    tobacco_train = datasets.ImageFolder(path + "/train",
                                         transform=transform_train)
 
-    tobacco_val = datasets.ImageFolder("datasets/Tobacco_test/val",
+    tobacco_val = datasets.ImageFolder(path + "/val",
                                         transform=transform_val)
 
-    tobacco_test = datasets.ImageFolder("datasets/Tobacco_test/test",
+    tobacco_test = datasets.ImageFolder(path + "/test",
                                         transform=transform_test)
 
     # Load N number of datasets in train dataset
