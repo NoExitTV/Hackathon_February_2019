@@ -343,7 +343,7 @@ def load_data(input_size, batch_size):
     
     # DEBUG
     i = 0
-    for inputs, labels in train_loader:
+    for inputs, labels in tobacco:
         i += 1
         print(inputs.shape)
         print(labels.shape)
