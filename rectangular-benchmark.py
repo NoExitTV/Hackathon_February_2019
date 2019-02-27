@@ -256,7 +256,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Fa
 
     return model_ft, input_size
 
-def create_dataset_splits():
+def create_dataset_splits(r):
     CLASSES = ("ADVE", "Email", "Form", "Letter", "Memo", "News", "Note", "Report", "Resume", "Scientific")
     ROOT = "datasets/Tobacco_test/"
 
@@ -272,7 +272,7 @@ def create_dataset_splits():
             if not os.path.exists(dir):
                 os.makedirs(dir)
 
-    t = Tobacco("datasets/Tobacco_all/all", num_splits=1)
+    t = Tobacco("datasets/Tobacco_all/all", num_splits=1, random_state=r)
 
     phases = ['train', 'val', 'test']
     for phase in phases:
@@ -284,7 +284,8 @@ def create_dataset_splits():
         for i in t.splits[0][phase]:
             dest = dir_path + CLASSES[i[1]] + "/"
             copy2(i[0], dest)
-            print("copied %s to %s" % (i[0], dest))
+            #print("copied %s to %s" % (i[0], dest))
+        print("Done copying "+ phase + "!")
         
 
 def load_data(input_size, batch_size):
@@ -434,7 +435,7 @@ results = []
 for i in range(number_of_different_splits):
     
     print("Creating new dataset splits")
-    create_dataset_splits()
+    create_dataset_splits(1337+i)
 
     train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
