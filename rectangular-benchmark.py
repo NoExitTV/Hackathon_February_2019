@@ -82,7 +82,6 @@ def train_model(model, dataloaders, criterion, optimizer, execution_number, tota
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
 
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
-            print('Best val Acc: {:4f} in Epoch: {:.0f}'.format(best_acc, best_epoch))
 
             # deep copy the model
             if phase == 'val' and epoch_acc > best_acc:
@@ -92,6 +91,7 @@ def train_model(model, dataloaders, criterion, optimizer, execution_number, tota
             if phase == 'val':
                 val_acc_history.append(epoch_acc)
 
+        print('Best val Acc: {:4f} in Epoch: {:.0f}'.format(best_acc, best_epoch))
         print()
 
     time_elapsed = time.time() - since
