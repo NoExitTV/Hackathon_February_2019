@@ -26,44 +26,49 @@
                 nn.Linear(4096, num_classes)
             )
 
+Testing done! Calculating results...
 resnet:
-Accuracy of the network on the 2482 test images: 76.5109 %
-Accuracy of ADVE : 96.1538 %
-Accuracy of Email : 89.5792 %
-Accuracy of Form : 70.3927 %
-Accuracy of Letter : 63.3833 %
-Accuracy of Memo : 85.9615 %
-Accuracy of News : 88.6364 %
-Accuracy of Note : 83.1683 %
-Accuracy of Report : 62.4242 %
-Accuracy of Resume : 70.0000 %
-Accuracy of Scientific : 44.7205 %
-
-resnet:
-Accuracy of the network on the 2482 test images: 76.5109 %
+Accuracy of the network on the 2482 test images: 78.3642 %
 Accuracy of ADVE : 96.1538 %
 Accuracy of Email : 92.7856 %
-Accuracy of Form : 75.8308 %
-Accuracy of Letter : 76.8737 %
-Accuracy of Memo : 66.1538 %
-Accuracy of News : 94.3182 %
-Accuracy of Note : 87.1287 %
-Accuracy of Report : 58.1818 %
-Accuracy of Resume : 90.0000 %
-Accuracy of Scientific : 44.7205 %
+Accuracy of Form : 84.8943 %
+Accuracy of Letter : 72.1627 %
+Accuracy of Memo : 73.6538 %
+Accuracy of News : 90.9091 %
+Accuracy of Note : 80.1980 %
+Accuracy of Report : 46.0606 %
+Accuracy of Resume : 75.0000 %
+Accuracy of Scientific : 64.5963 %
 
 resnet:
-Accuracy of the network on the 2482 test images: 76.3094 %
-Accuracy of ADVE : 91.5385 %
-Accuracy of Email : 94.9900 %
-Accuracy of Form : 82.4773 %
-Accuracy of Letter : 77.7302 %
-Accuracy of Memo : 65.1923 %
-Accuracy of News : 93.1818 %
-Accuracy of Note : 79.2079 %
-Accuracy of Report : 41.2121 %
-Accuracy of Resume : 75.0000 %
-Accuracy of Scientific : 50.3106 %
+Accuracy of the network on the 2482 test images: 72.7236 %
+Accuracy of ADVE : 93.8462 %
+Accuracy of Email : 93.1864 %
+Accuracy of Form : 69.4864 %
+Accuracy of Letter : 49.4647 %
+Accuracy of Memo : 72.1154 %
+Accuracy of News : 96.5909 %
+Accuracy of Note : 77.2277 %
+Accuracy of Report : 64.8485 %
+Accuracy of Resume : 80.0000 %
+Accuracy of Scientific : 59.6273 %
 
-Average accuracy on 7446 test images in 3 number of runs: 76.4437 %
-Total correct: 5692 | Total number of images: 7446
+resnet:
+Accuracy of the network on the 2482 test images: 70.2256 %
+Accuracy of ADVE : 83.0769 %
+Accuracy of Email : 89.1784 %
+Accuracy of Form : 65.5589 %
+Accuracy of Letter : 46.6809 %
+Accuracy of Memo : 74.8077 %
+Accuracy of News : 95.4545 %
+Accuracy of Note : 80.1980 %
+Accuracy of Report : 70.9091 %
+Accuracy of Resume : 70.0000 %
+Accuracy of Scientific : 43.4783 %
+
+
+
+Average accuracy on 7446 test images in 3 number of runs: 73.7712 %
+Total correct: 5493, Total number of images: 7446
+Total runtime: 97m 5s
+
