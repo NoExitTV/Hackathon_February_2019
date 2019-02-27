@@ -361,7 +361,7 @@ for model_name in models_list:
     #  that we have just initialized, i.e. the parameters with requires_grad
     #  is True.
     params_to_update = model_ft.parameters()
-    # print("Params to learn:")
+    print("Params to learn:")
     if feature_extract:
         params_to_update = []
         for name,param in model_ft.named_parameters():
