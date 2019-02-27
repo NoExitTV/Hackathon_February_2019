@@ -467,7 +467,7 @@ for split_num in range(number_of_different_splits):
     create_dataset_splits(seed=1337+split_num, append_path=str(split_num))
 
     # Initialize data loaders and save in dict
-    train_loader, val_loader, test_loader, classes = load_data(0, batch_size, append_path=split_num)
+    train_loader, val_loader, test_loader, classes = load_data(0, batch_size, append_path=str(split_num))
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
     model_num = 0 # Keep track of the number of runs we've been doing
