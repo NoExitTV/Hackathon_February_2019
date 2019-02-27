@@ -341,19 +341,19 @@ def load_data(input_size, batch_size, append_path=None):
     ''' Uncomment the below lines to load a dataset saved on disk '''
 
     # Get path of where to load dataset
-    path = "datasets/Tobacco_test"
+    path = "datasets/Tobacco_test/"
     if append_path is not None:
-        path = path + "/" + append_path
+        path = path + append_path + "/"
 
     print("Loading dataset from path {}".format(path))
 
-    tobacco_train = datasets.ImageFolder(path + "/train",
+    tobacco_train = datasets.ImageFolder(path + "train",
                                         transform=transform_train)
 
-    tobacco_val = datasets.ImageFolder(path + "/val",
+    tobacco_val = datasets.ImageFolder(path + "val",
                                         transform=transform_val)
 
-    tobacco_test = datasets.ImageFolder(path + "/test",
+    tobacco_test = datasets.ImageFolder(path + "test",
                                         transform=transform_test)
 
     # Load N number of datasets in train dataset
@@ -442,7 +442,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0): {}".format(torch.cuda.get_device_name(0)))
 
 batch_size = 16 # Minibatch size
-num_epochs = 2
+num_epochs = 100
 learning_rate = 1e-4
 num_classes = 10
 number_of_different_splits = 3
