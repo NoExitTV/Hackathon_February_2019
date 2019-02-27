@@ -323,15 +323,14 @@ def load_data(input_size, batch_size):
     print("Tobacco train len: ", len(tobacco))
     train_loader = torch.utils.data.DataLoader(dataset=tobacco,
                                             batch_size=batch_size,
-                                            shuffle=True,
-                                            num_workers=8)
+                                            shuffle=True)
 
     # Load n number of datasets into val dataset
     tobacco.load_split("val")
     print("Tobacco val len: ", len(tobacco))
     val_loader = torch.utils.data.DataLoader(dataset=tobacco,
                                             batch_size=batch_size,
-                                            num_workers=8)
+                                            shuffle=False)
 
     # Load N number of datasets into test dataset
     tobacco.load_split("test")
