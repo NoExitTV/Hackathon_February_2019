@@ -514,7 +514,7 @@ for split_num in range(number_of_different_splits):
         model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, execution_number, total_runs, num_epochs=num_epochs)
 
         # Save model
-        torch.save(model_ft.state_dict(), "./saved-models/" + model_name + "-rectangular.pth")
+        torch.save(model_ft.state_dict(), "./saved-models/" + model_name + "-rectangular-" + str(execution_number) + ".pth")
 
         # Test
         correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes, execution_number, total_runs)
