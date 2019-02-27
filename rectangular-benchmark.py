@@ -257,12 +257,12 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Fa
 
 def create_dataset_splits():
     CLASSES = ("ADVE", "Email", "Form", "Letter", "Memo", "News", "Note", "Report", "Resume", "Scientific")
-    ROOT = "datasets/Tobacco_test"
+    ROOT = "datasets/Tobacco_test/"
 
     # First, remove everything in root
-    os.rmdir(ROOT + "/test")
-    os.rmdir(ROOT + "/train")
-    os.rmdir(ROOT + "/val")
+    os.rmdir(ROOT + "test")
+    os.rmdir(ROOT + "train")
+    os.rmdir(ROOT + "val")
     print("Removed test, train, val dirs!")
 
     def check_and_make_dir(set_name, classes):
