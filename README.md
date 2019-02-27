@@ -6,6 +6,7 @@ Use resnet/vgg/alexnet that have been trained on IMAGENET using rectangular imag
 
 # How to execute?
 Run with commant:  
-'''
-python rectangular-benchmark.py 2>&1 | tee -a outputs/$(date +%F_%T).log
-'''
+```
+python rectangular-benchmark.py 2>&1 | tee -a outputs/$(date +%Y%m%d_%H%M%S).log
+```
+This will save the output in a file formatted as YYYYMMDD_hhmmss.log in the outputs folder.
