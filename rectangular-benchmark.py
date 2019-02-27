@@ -320,7 +320,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0)", torch.cuda.get_device_name(0))
 
 batch_size = 16 # Minibatch size
-num_epochs = 50
+num_epochs = 75
 learning_rate = 0.5e-3
 num_classes = 10
 
@@ -329,7 +329,7 @@ num_classes = 10
 ########## Run tests ##########
 
 # models_list = ["resnet" for i in range(5)]  # Run the same model 5 times and calc average
-models_list = ["resnet"]
+models_list = ["vgg"]
 results = []
 
 train_loader, val_loader, test_loader, classes = load_data(0, batch_size)
@@ -340,7 +340,7 @@ for model_name in models_list:
 
     # Flag for feature extracting. When False, we finetune the whole model,
     #   when True we only update the reshaped layer params
-    feature_extract = True
+    feature_extract = False
 
     # Initialize the model for this run
     model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=False)
