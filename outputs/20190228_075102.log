@@ -1,3 +1,23 @@
+### Hyperparameters used ###
+target_resolution = (480, 640)
+
+resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
+					torchvision.transforms.RandomCrop(target_resolution)])
+
+transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+					transforms.RandomHorizontalFlip(),
+					torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
+					torchvision.transforms.ToTensor(),
+					transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+batch_size = 16 # Minibatch size
+num_epochs = 100
+learning_rate = 1e-4
+num_classes = 10
+number_of_different_splits = 3
+
+
+### Output ###
 PyTorch Version:  1.0.1.post2
 Torchvision Version:  0.2.1
 Running on device: cuda:0

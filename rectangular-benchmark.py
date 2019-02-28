@@ -258,7 +258,7 @@ def initialize_model_rectangular(model_name, num_classes, feature_extract, use_p
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
-        
+
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
@@ -270,28 +270,29 @@ def initialize_model_rectangular(model_name, num_classes, feature_extract, use_p
     return model_ft, input_size
 
 def initialize_model_square(model_name, num_classes, feature_extract, use_pretrained=False):
-    ''' Initializes the models that have been pre-trained on rectangular images from imagenet '''
+    ''' Initializes the original models that been trained on square images '''
     
     model_ft = None
     input_size = 0
 
-    if model_name == "resnet18":
+    if model_name == "resnet":
         """ Resnet18
         """
         model_ft = models.resnet18(pretrained=use_pretrained)
+        
         set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs, num_classes)
-        input_size = 224
-
-    elif model_name == "resnet50":
-        """ Resnet50
-        """
-        model_ft = models.resnet50(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs, num_classes)
-        input_size = 224
+        
+         # Change last fc layer
+        model_ft.fc = nn.Sequential(
+            nn.Dropout(p=0.1),
+            nn.Linear(64512, 4096),
+            nn.ReLU(),
+            nn.Dropout(p=0.1),
+            nn.Linear(4096, num_classes)
+        )
+        # num_ftrs = model_ft.fc.in_features
+        # model_ft.fc = nn.Linear(num_ftrs, num_classes)
+        # input_size = 224
 
     elif model_name == "alexnet":
         """ Alexnet
@@ -433,11 +434,11 @@ def load_data_rectangular(batch_size, append_path=None):
 def load_data_square(batch_size, append_path=None):
     ''' Loads the images and transform them into square sizes '''
 
-    target_resolution = (554, 554)
+    target_resolution = (480, 480)
 
     print("Initializing square Datasets and Dataloaders...")
 
-    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((831, 831)),
+    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 720)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
 
     transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
@@ -531,7 +532,9 @@ for split_num in range(number_of_different_splits):
     create_dataset_splits(seed=1337+split_num, append_path=str(split_num))
 
     # Initialize data loaders and save in dict
-    train_loader, val_loader, test_loader, classes = load_data_rectangular(batch_size, append_path=str(split_num))
+    train_loader, val_loader, test_loader, classes = load_data_square(batch_size, append_path=str(split_num)) # Square
+    #train_loader, val_loader, test_loader, classes = load_data_rectangular(batch_size, append_path=str(split_num)) # Rectangular
+    
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
     model_num = 0 # Keep track of the number of runs we've been doing
@@ -548,7 +551,8 @@ for split_num in range(number_of_different_splits):
         feature_extract = False
 
         # Initialize the model for this run
-        model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=False)
+        model_ft, input_size = initialize_model_square(model_name, num_classes, feature_extract, use_pretrained=True) # Square
+        # model_ft, input_size = initialize_model_rectangular(model_name, num_classes, feature_extract, use_pretrained=False) # Rectangular
 
         # Print the model we just instantiated
         if execution_number == 1:
@@ -585,7 +589,7 @@ for split_num in range(number_of_different_splits):
         model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, execution_number, total_runs, num_epochs=num_epochs)
 
         # Save model
-        torch.save(model_ft.state_dict(), "./saved-models/" + model_name + "-rectangular-" + str(execution_number) + ".pth")
+        torch.save(model_ft.state_dict(), "./saved-models/" + model_name + "-square-" + str(execution_number) + ".pth")
 
         # Test
         correct, total, class_correct, class_total = test_model(model_ft, dataloaders_dict, classes, execution_number, total_runs)
