@@ -528,7 +528,7 @@ num_epochs = 100
 learning_rate = 1e-4
 weight_decay = 1e-1
 num_classes = 10
-number_of_different_splits = 1
+number_of_different_splits = 3
 
 
 #%%
@@ -551,8 +551,8 @@ for split_num in range(number_of_different_splits):
     create_dataset_splits(seed=1337+split_num, append_path=str(split_num))
 
     # Initialize data loaders and save in dict
-    train_loader, val_loader, test_loader, classes = load_data_square(batch_size, append_path=str(split_num)) # Square
-    #train_loader, val_loader, test_loader, classes = load_data_rectangular(batch_size, append_path=str(split_num)) # Rectangular
+    # train_loader, val_loader, test_loader, classes = load_data_square(batch_size, append_path=str(split_num)) # Square
+    train_loader, val_loader, test_loader, classes = load_data_rectangular(batch_size, append_path=str(split_num)) # Rectangular
     
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
@@ -570,8 +570,8 @@ for split_num in range(number_of_different_splits):
         feature_extract = False
 
         # Initialize the model for this run
-        model_ft, input_size = initialize_model_square(model_name, num_classes, feature_extract, use_pretrained=True) # Square
-        # model_ft, input_size = initialize_model_rectangular(model_name, num_classes, feature_extract, use_pretrained=False) # Rectangular
+        # model_ft, input_size = initialize_model_square(model_name, num_classes, feature_extract, use_pretrained=True) # Square
+        model_ft, input_size = initialize_model_rectangular(model_name, num_classes, feature_extract, use_pretrained=False) # Rectangular
 
         # Print the model we just instantiated
         if execution_number == 1:
