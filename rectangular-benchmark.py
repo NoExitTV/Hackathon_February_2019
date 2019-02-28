@@ -269,7 +269,7 @@ def initialize_model_rectangular(model_name, num_classes, feature_extract, use_p
 
     return model_ft, input_size
 
-def initialize_model_square(model_name, num_classes, feature_extract, use_pretrained=False):
+def initialize_model_square(model_name, num_classes, feature_extract, use_pretrained=True):
     ''' Initializes the original models that been trained on square images '''
     
     model_ft = None
@@ -285,7 +285,7 @@ def initialize_model_square(model_name, num_classes, feature_extract, use_pretra
          # Change last fc layer
         model_ft.fc = nn.Sequential(
             nn.Dropout(p=0.1),
-            nn.Linear(64512, 4096),
+            nn.Linear(41472, 4096),
             nn.ReLU(),
             nn.Dropout(p=0.1),
             nn.Linear(4096, num_classes)
@@ -506,7 +506,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0): {}".format(torch.cuda.get_device_name(0)))
 
 batch_size = 16 # Minibatch size
-num_epochs = 100
+num_epochs = 2
 learning_rate = 1e-4
 num_classes = 10
 number_of_different_splits = 3
