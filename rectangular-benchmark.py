@@ -111,6 +111,7 @@ def train_model_without_val(model, dataloaders, criterion, optimizer, execution_
     since = time.time()
 
     for epoch in range(num_epochs):
+        time_elapsed = time.time() - since
         print('Epoch {}/{} [Duration: {:.0f}m {:.0f}s] [Run: {}/{}]'.format(epoch, num_epochs - 1, time_elapsed // 60, time_elapsed % 60, execution_number, total_runs))
         print('-' * 10)
 
@@ -220,6 +221,7 @@ def initialize_model_rectangular(model_name, num_classes, feature_extract, use_p
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
 
+        # Freeze / un-freeze layers
         set_parameter_requires_grad(model_ft, feature_extract)
         
         # Change last fc layer
@@ -243,7 +245,10 @@ def initialize_model_rectangular(model_name, num_classes, feature_extract, use_p
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
 
+        # Freeze / un-freeze layers
         set_parameter_requires_grad(model_ft, feature_extract)
+        
+        # Change last fc layer
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
@@ -259,7 +264,10 @@ def initialize_model_rectangular(model_name, num_classes, feature_extract, use_p
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
 
+        # Freeze / un-freeze layers
         set_parameter_requires_grad(model_ft, feature_extract)
+        
+        # Change last fc layer
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
@@ -280,9 +288,10 @@ def initialize_model_square(model_name, num_classes, feature_extract, use_pretra
         """
         model_ft = models.resnet18(pretrained=use_pretrained)
         
+        # Freeze / un-freeze layers
         set_parameter_requires_grad(model_ft, feature_extract)
         
-         # Change last fc layer
+        # Change last fc layer
         model_ft.fc = nn.Sequential(
             nn.Dropout(p=0.1),
             nn.Linear(41472, 4096),
@@ -290,27 +299,30 @@ def initialize_model_square(model_name, num_classes, feature_extract, use_pretra
             nn.Dropout(p=0.1),
             nn.Linear(4096, num_classes)
         )
-        # num_ftrs = model_ft.fc.in_features
-        # model_ft.fc = nn.Linear(num_ftrs, num_classes)
-        # input_size = 224
 
     elif model_name == "alexnet":
         """ Alexnet
         """
         model_ft = models.alexnet(pretrained=use_pretrained)
+        
+        # Freeze / un-freeze layers
         set_parameter_requires_grad(model_ft, feature_extract)
+        
+        # Change last fc layer
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
-        input_size = 224
 
     elif model_name == "vgg":
         """ VGG11_bn
         """
         model_ft = models.vgg11_bn(pretrained=use_pretrained)
+        
+        # Freeze / un-freeze layers
         set_parameter_requires_grad(model_ft, feature_extract)
+        
+        # Change last fc layer
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
-        input_size = 224
 
     else:
         print("Invalid model name, exiting...")
@@ -319,6 +331,10 @@ def initialize_model_square(model_name, num_classes, feature_extract, use_pretra
     return model_ft, input_size
 
 def create_dataset_splits(seed=1337, append_path="NaN"):
+    ''' This function creates a dataset split where the randomness depends on the seed value.
+        Same seed will generaye the same split. The idea is to increment the seed for every split iteration
+        and thus get a new train / test / val split to benchmark the model on.
+        The generated dataset will then be saved to disk so that it can be loaded by torchvision dataloaders in another function. '''
 
     CLASSES = ("ADVE", "Email", "Form", "Letter", "Memo", "News", "Note", "Report", "Resume", "Scientific")
     ROOT = "datasets/Tobacco_test/" + append_path + "/"
@@ -369,7 +385,8 @@ def load_data_rectangular(batch_size, append_path=None):
     target_resolution = (480, 640)
 
     print("Initializing rectangular Datasets and Dataloaders...")
-
+    print("Target resolution: {}".format(target_resolution))
+    
     resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
 
@@ -437,6 +454,7 @@ def load_data_square(batch_size, append_path=None):
     target_resolution = (480, 480)
 
     print("Initializing square Datasets and Dataloaders...")
+    print("Target resolution: {}".format(target_resolution))
 
     resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 720)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
@@ -506,7 +524,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0): {}".format(torch.cuda.get_device_name(0)))
 
 batch_size = 16 # Minibatch size
-num_epochs = 2
+num_epochs = 100
 learning_rate = 1e-4
 num_classes = 10
 number_of_different_splits = 3
