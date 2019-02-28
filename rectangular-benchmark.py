@@ -102,59 +102,59 @@ def train_model(model, dataloaders, criterion, optimizer, execution_number, tota
     model.load_state_dict(best_model_wts)
     return model, val_acc_history
 
-def train_model_without_val(model, dataloaders, criterion, optimizer, execution_number, total_runs, num_epochs=25):
-    ''' In this function we do the same training as train_model but we do not load the weights that gave the best validation accuracy.
-        This is the training function that should be ran on the full 100 test images per class (without validation) '''
+# def train_model_without_val(model, dataloaders, criterion, optimizer, execution_number, total_runs, num_epochs=25):
+#     ''' In this function we do the same training as train_model but we do not load the weights that gave the best validation accuracy.
+#         This is the training function that should be ran on the full 100 test images per class (without validation) '''
     
-    print("Training on device: {}".format(device))
+#     print("Training on device: {}".format(device))
 
-    since = time.time()
+#     since = time.time()
 
-    for epoch in range(num_epochs):
-        time_elapsed = time.time() - since
-        print('Epoch {}/{} [Duration: {:.0f}m {:.0f}s] [Run: {}/{}]'.format(epoch, num_epochs - 1, time_elapsed // 60, time_elapsed % 60, execution_number, total_runs))
-        print('-' * 10)
+#     for epoch in range(num_epochs):
+#         time_elapsed = time.time() - since
+#         print('Epoch {}/{} [Duration: {:.0f}m {:.0f}s] [Run: {}/{}]'.format(epoch, num_epochs - 1, time_elapsed // 60, time_elapsed % 60, execution_number, total_runs))
+#         print('-' * 10)
 
-        model.train()  # Set model to training mode
+#         model.train()  # Set model to training mode
 
-        running_loss = 0.0
-        running_corrects = 0
+#         running_loss = 0.0
+#         running_corrects = 0
 
-        # Iterate over data.
-        for inputs, labels in dataloaders['train']:
-            inputs = inputs.to(device)
-            labels = labels.to(device)
+#         # Iterate over data.
+#         for inputs, labels in dataloaders['train']:
+#             inputs = inputs.to(device)
+#             labels = labels.to(device)
 
-            # zero the parameter gradients
-            optimizer.zero_grad()
+#             # zero the parameter gradients
+#             optimizer.zero_grad()
 
-            # forward
-            # track history if only in train
-            with torch.set_grad_enabled(True):
+#             # forward
+#             # track history if only in train
+#             with torch.set_grad_enabled(True):
                 
-                outputs = model(inputs)
-                loss = criterion(outputs, labels)
+#                 outputs = model(inputs)
+#                 loss = criterion(outputs, labels)
 
-                _, preds = torch.max(outputs, 1)
+#                 _, preds = torch.max(outputs, 1)
 
-                loss.backward()
-                optimizer.step()   
+#                 loss.backward()
+#                 optimizer.step()   
 
-            # statistics
-            running_loss += loss.item() * inputs.size(0)
-            running_corrects += torch.sum(preds == labels.data)
+#             # statistics
+#             running_loss += loss.item() * inputs.size(0)
+#             running_corrects += torch.sum(preds == labels.data)
 
-        epoch_loss = running_loss / len(dataloaders['train'].dataset)
-        epoch_acc = running_corrects.double() / len(dataloaders['train'].dataset)
+#         epoch_loss = running_loss / len(dataloaders['train'].dataset)
+#         epoch_acc = running_corrects.double() / len(dataloaders['train'].dataset)
 
-        print('{} Loss: {:.4f} Acc: {:.4f}'.format('train', epoch_loss, epoch_acc))
+#         print('{} Loss: {:.4f} Acc: {:.4f}'.format('train', epoch_loss, epoch_acc))
 
-        print()
+#         print()
 
-    time_elapsed = time.time() - since
-    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+#     time_elapsed = time.time() - since
+#     print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
 
-    return model, [] # Return empty val_acc_history here...
+#     return model, [] # Return empty val_acc_history here...
 
 def test_model(model, dataloaders, classes, execution_number, total_runs):
     print("Testing on device: {}".format(device))
@@ -386,7 +386,7 @@ def load_data_rectangular(batch_size, append_path=None):
 
     print("Initializing rectangular Datasets and Dataloaders...")
     print("Target resolution: {}".format(target_resolution))
-    
+
     resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
 
@@ -527,7 +527,7 @@ batch_size = 16 # Minibatch size
 num_epochs = 100
 learning_rate = 1e-4
 num_classes = 10
-number_of_different_splits = 3
+number_of_different_splits = 1
 
 
 #%%
@@ -598,7 +598,7 @@ for split_num in range(number_of_different_splits):
                     print("\t",name)
 
         # Observe that all parameters are being optimized
-        optimizer_ft = optim.Adam(params_to_update, lr=learning_rate) # We could try and implement a degrading learning rate!
+        optimizer_ft = optim.Adam(params_to_update, lr=learning_rate, weight_decay=1e-3) # We could try and implement a degrading learning rate!
 
         # Setup the loss fxn
         criterion = nn.CrossEntropyLoss()
