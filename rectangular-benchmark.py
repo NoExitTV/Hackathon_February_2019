@@ -526,9 +526,9 @@ if torch.cuda.is_available():
 batch_size = 16 # Minibatch size
 num_epochs = 100
 learning_rate = 1e-4
-weight_decay = 1e-1
+weight_decay = 10
 num_classes = 10
-number_of_different_splits = 3
+number_of_different_splits = 1
 
 
 #%%
