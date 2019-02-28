@@ -526,7 +526,7 @@ if torch.cuda.is_available():
 batch_size = 16 # Minibatch size
 num_epochs = 100
 learning_rate = 1e-4
-weight_decay = 1e-3
+weight_decay = 1e-2
 num_classes = 10
 number_of_different_splits = 1
 
@@ -600,7 +600,7 @@ for split_num in range(number_of_different_splits):
 
         # Observe that all parameters are being optimized
         optimizer_ft = optim.Adam(params_to_update, lr=learning_rate, weight_decay=weight_decay)
-        
+
         # Setup the loss fxn
         criterion = nn.CrossEntropyLoss()
 
