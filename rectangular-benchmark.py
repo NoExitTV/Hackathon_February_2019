@@ -293,10 +293,10 @@ def initialize_model_square(model_name, num_classes, feature_extract, use_pretra
         
         # Change last fc layer
         model_ft.fc = nn.Sequential(
-            nn.Dropout(p=0.1),
+            nn.Dropout(p=0.5),
             nn.Linear(41472, 4096),
             nn.ReLU(),
-            nn.Dropout(p=0.1),
+            nn.Dropout(p=0.5),
             nn.Linear(4096, num_classes)
         )
 
@@ -526,7 +526,7 @@ if torch.cuda.is_available():
 batch_size = 16 # Minibatch size
 num_epochs = 100
 learning_rate = 1e-4
-weight_decay = 1e-2
+weight_decay = 1e-1
 num_classes = 10
 number_of_different_splits = 1
 
