@@ -203,9 +203,9 @@ def set_parameter_requires_grad(model, feature_extracting):
         for param in model.parameters():
             param.requires_grad = False
 
-def initialize_model(model_name, num_classes, feature_extract, use_pretrained=False):
-    # Initialize these variables which will be set in this if statement. Each of these
-    #   variables is model specific.
+def initialize_model_rectangular(model_name, num_classes, feature_extract, use_pretrained=False):
+    ''' Initializes the models that have been pre-trained on rectangular images from imagenet '''
+
     model_ft = None
     input_size = 0
 
@@ -213,14 +213,14 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Fa
         """ Pretrained resnet
         """
         model_ft = models.resnet18(pretrained=use_pretrained)
+        
+        # Load pretrained weights
         checkpoint = torch.load('./pretrained-models/resnet/model_best.pth.tar')
         state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint['state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
+
         set_parameter_requires_grad(model_ft, feature_extract)
-        
-        # num_ftrs = model_ft.fc.in_features
-        # model_ft.fc = nn.Linear(64512, num_classes)
         
         # Change last fc layer
         model_ft.fc = nn.Sequential(
@@ -235,11 +235,14 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Fa
         """ Pretrained alexnet
         """
         model_ft = AlexNet()
+
+        # Load pretrained weights
         checkpoint = torch.load('./pretrained-models/alexnet/model_best.pth.tar')
         state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
+
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
@@ -248,14 +251,65 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Fa
         """ Pretrained vgg
         """
         model_ft = vgg13()
+
+        # Load pretrained weights
         checkpoint = torch.load('./pretrained-models/vgg/model_best.pth.tar')
         state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint[
                     'state_dict'].items()}
         model_ft.load_state_dict(state_dict)
         model_ft.eval()
+        
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
+
+    else:
+        print("Invalid model name, exiting...")
+        exit()
+
+    return model_ft, input_size
+
+def initialize_model_square(model_name, num_classes, feature_extract, use_pretrained=False):
+    ''' Initializes the models that have been pre-trained on rectangular images from imagenet '''
+    
+    model_ft = None
+    input_size = 0
+
+    if model_name == "resnet18":
+        """ Resnet18
+        """
+        model_ft = models.resnet18(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.fc.in_features
+        model_ft.fc = nn.Linear(num_ftrs, num_classes)
+        input_size = 224
+
+    elif model_name == "resnet50":
+        """ Resnet50
+        """
+        model_ft = models.resnet50(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.fc.in_features
+        model_ft.fc = nn.Linear(num_ftrs, num_classes)
+        input_size = 224
+
+    elif model_name == "alexnet":
+        """ Alexnet
+        """
+        model_ft = models.alexnet(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.classifier[6].in_features
+        model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
+        input_size = 224
+
+    elif model_name == "vgg":
+        """ VGG11_bn
+        """
+        model_ft = models.vgg11_bn(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.classifier[6].in_features
+        model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
+        input_size = 224
 
     else:
         print("Invalid model name, exiting...")
@@ -308,10 +362,12 @@ def create_dataset_splits(seed=1337, append_path="NaN"):
         print("Done copying {} to {}".format(phase, ROOT))
         
 
-def load_data(input_size, batch_size, append_path=None):
+def load_data_rectangular(batch_size, append_path=None):
+    ''' Loads the images and transform them into rectangular sizes '''
+
     target_resolution = (480, 640)
 
-    print("Initializing Datasets and Dataloaders...")
+    print("Initializing rectangular Datasets and Dataloaders...")
 
     resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((720, 960)),
                                             torchvision.transforms.RandomCrop(target_resolution)])
@@ -338,7 +394,6 @@ def load_data(input_size, batch_size, append_path=None):
     #
     # Load dataset
     #
-    ''' Uncomment the below lines to load a dataset saved on disk '''
 
     # Get path of where to load dataset
     path = "datasets/Tobacco_test/"
@@ -372,61 +427,69 @@ def load_data(input_size, batch_size, append_path=None):
                                             batch_size=batch_size,
                                             shuffle=False)
 
-    #
-    #
-    # use Tobacco and create a random split!
-    #
-    ''' Use this only if you want to load the entire dataset and create a random train/val/test split '''
-    
-    # transform_train_tobacco = [torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
-    #                             transforms.RandomHorizontalFlip(),
-    #                             torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
-    #                             torchvision.transforms.ToTensor(),
-    #                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
-
-    # tobacco_train2 = Tobacco("datasets/Tobacco_all/all",
-    #                         preprocess=transform_train_tobacco)
-    # tobacco_val = Tobacco("datasets/Tobacco_all/all",
-    #                         preprocess=transform_val)
-    # tobacco_test = Tobacco("datasets/Tobacco_all/all", 
-    #                         preprocess=transform_test)
-    
-    # # Load N number of datasets in train dataset
-    # tobacco_train2.load_split("train")
-    # print("Tobacco train len: ", len(tobacco_train2))
-    # train_loader = torch.utils.data.DataLoader(dataset=tobacco_train2,
-    #                                         batch_size=batch_size,
-    #                                         shuffle=True,
-    #                                         num_workers=8)
-
-    # # Load n number of datasets into val dataset
-    # tobacco_val.load_split("val")
-    # print("Tobacco val len: ", len(tobacco_val))
-    # val_loader = torch.utils.data.DataLoader(dataset=tobacco_val,
-    #                                         batch_size=batch_size,
-    #                                         shuffle=False,
-    #                                         num_workers=8)
-
-    # # Load N number of datasets into test dataset
-    # tobacco_test.load_split("test")
-    # print("Tobacco test len: ", len(tobacco_test))
-    # test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
-    #                                         batch_size=batch_size,
-    #                                         shuffle=False)
-    
-    # # DEBUG
-    # print(train_loader)
-    # print(len(train_loader))
-    # i = 0
-    # for inputs, labels in train_loader:
-    #     i += 1
-    #     print(inputs.shape)
-    #     print(labels.shape)
-    #     if i > 10:
-    #         break
-
-
     return train_loader, val_loader, test_loader, tobacco_train.classes   
+
+
+def load_data_square(batch_size, append_path=None):
+    ''' Loads the images and transform them into square sizes '''
+
+    target_resolution = (554, 554)
+
+    print("Initializing square Datasets and Dataloaders...")
+
+    resize_and_crop = torchvision.transforms.Compose([torchvision.transforms.Resize((831, 831)),
+                                            torchvision.transforms.RandomCrop(target_resolution)])
+
+    transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
+                                           transforms.RandomHorizontalFlip(),
+                                           torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
+                                           torchvision.transforms.ToTensor(),
+                                           transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+    transform_val = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
+                                            torchvision.transforms.ToTensor(),
+                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    
+    transform_test = torchvision.transforms.Compose([torchvision.transforms.Resize(target_resolution),
+                                            torchvision.transforms.ToTensor(),
+                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    #
+    # Load dataset
+    #
+
+    # Get path of where to load dataset
+    path = "datasets/Tobacco_test/"
+    if append_path is not None:
+        path = path + append_path + "/"
+
+    print("Loading dataset from path {}".format(path))
+
+    tobacco_train = datasets.ImageFolder(path + "train",
+                                        transform=transform_train)
+
+    tobacco_val = datasets.ImageFolder(path + "val",
+                                        transform=transform_val)
+
+    tobacco_test = datasets.ImageFolder(path + "test",
+                                        transform=transform_test)
+
+    # Load N number of datasets in train dataset
+    train_loader = torch.utils.data.DataLoader(dataset=tobacco_train,
+                                            batch_size=batch_size,
+                                            shuffle=True,
+                                            num_workers=8)
+
+    # Load n number of datasets into val dataset
+    val_loader = torch.utils.data.DataLoader(dataset=tobacco_val,
+                                            batch_size=batch_size,
+                                            num_workers=8)
+
+    # Load N number of datasets into test dataset
+    test_loader = torch.utils.data.DataLoader(dataset=tobacco_test,
+                                            batch_size=batch_size,
+                                            shuffle=False)
+
+    return train_loader, val_loader, test_loader, tobacco_train.classes  
 
 
 #%%
@@ -446,6 +509,7 @@ num_epochs = 100
 learning_rate = 1e-4
 num_classes = 10
 number_of_different_splits = 3
+
 
 #%%
 ########## Run tests ##########
@@ -467,7 +531,7 @@ for split_num in range(number_of_different_splits):
     create_dataset_splits(seed=1337+split_num, append_path=str(split_num))
 
     # Initialize data loaders and save in dict
-    train_loader, val_loader, test_loader, classes = load_data(0, batch_size, append_path=str(split_num))
+    train_loader, val_loader, test_loader, classes = load_data_rectangular(batch_size, append_path=str(split_num))
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
     model_num = 0 # Keep track of the number of runs we've been doing
