@@ -599,6 +599,7 @@ for split_num in range(number_of_different_splits):
                     print("\t",name)
 
         # Observe that all parameters are being optimized
+        print("Using learning rate {} and weight decay {}".format(learning_rate, weight_decay))
         optimizer_ft = optim.Adam(params_to_update, lr=learning_rate, weight_decay=weight_decay)
 
         # Setup the loss fxn
