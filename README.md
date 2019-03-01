@@ -8,6 +8,6 @@ The idea is to observe the original aspect ration as much as possible for the do
 # How to execute?
 Run with commant:  
 ```
-python rectangular-benchmark.py 2>&1 | tee -a outputs/$(date +%Y%m%d_%H%M%S).log
+python run-benchmark.py 2>&1 | tee -a outputs/$(date +%Y%m%d_%H%M%S).log
 ```
 This will save the output in a file formatted as YYYYMMDD_hhmmss.log in the outputs folder.
