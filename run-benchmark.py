@@ -226,10 +226,10 @@ def initialize_model_rectangular(model_name, num_classes, feature_extract, use_p
         
         # Change last fc layer
         model_ft.fc = nn.Sequential(
-            nn.Dropout(p=0.1),
+            nn.Dropout(p=0.5),
             nn.Linear(64512, 4096),
             nn.ReLU(),
-            nn.Dropout(p=0.1),
+            nn.Dropout(p=0.5),
             nn.Linear(4096, num_classes)
         )
 
@@ -524,7 +524,7 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0): {}".format(torch.cuda.get_device_name(0)))
 
 batch_size = 16 # Minibatch size
-num_epochs = 200
+num_epochs = 500
 learning_rate = 1e-4
 weight_decay = 1e-1
 num_classes = 10
@@ -551,8 +551,9 @@ for split_num in range(number_of_different_splits):
     create_dataset_splits(seed=1337+split_num, append_path=str(split_num))
 
     # Initialize data loaders and save in dict
-    train_loader, val_loader, test_loader, classes = load_data_square(batch_size, append_path=str(split_num)) # Square
-    # train_loader, val_loader, test_loader, classes = load_data_rectangular(batch_size, append_path=str(split_num)) # Rectangular
+    ''' Choose either square or rectangular below '''
+    # train_loader, val_loader, test_loader, classes = load_data_square(batch_size, append_path=str(split_num)) # Square
+    train_loader, val_loader, test_loader, classes = load_data_rectangular(batch_size, append_path=str(split_num)) # Rectangular
     
     dataloaders_dict = {"train": train_loader, "test": test_loader, "val": val_loader}
 
@@ -570,8 +571,9 @@ for split_num in range(number_of_different_splits):
         feature_extract = False
 
         # Initialize the model for this run
-        model_ft, input_size = initialize_model_square(model_name, num_classes, feature_extract, use_pretrained=True) # Square
-        # model_ft, input_size = initialize_model_rectangular(model_name, num_classes, feature_extract, use_pretrained=False) # Rectangular
+        ''' Choose either square or rectangular below '''
+        # model_ft, input_size = initialize_model_square(model_name, num_classes, feature_extract, use_pretrained=True) # Square
+        model_ft, input_size = initialize_model_rectangular(model_name, num_classes, feature_extract, use_pretrained=False) # Rectangular
 
         # Print the model we just instantiated
         if execution_number == 1:
