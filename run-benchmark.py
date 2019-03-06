@@ -226,10 +226,10 @@ def initialize_model_rectangular(model_name, num_classes, feature_extract, use_p
         
         # Change last fc layer
         model_ft.fc = nn.Sequential(
-            nn.Dropout(p=0.5),
+            nn.Dropout(p=0.1),
             nn.Linear(64512, 4096),
             nn.ReLU(),
-            nn.Dropout(p=0.5),
+            nn.Dropout(p=0.1),
             nn.Linear(4096, num_classes)
         )
 
@@ -293,10 +293,10 @@ def initialize_model_square(model_name, num_classes, feature_extract, use_pretra
         
         # Change last fc layer
         model_ft.fc = nn.Sequential(
-            nn.Dropout(p=0.5),
+            nn.Dropout(p=0.1),
             nn.Linear(41472, 4096),
             nn.ReLU(),
-            nn.Dropout(p=0.5),
+            nn.Dropout(p=0.1),
             nn.Linear(4096, num_classes)
         )
 
@@ -393,7 +393,6 @@ def load_data_rectangular(batch_size, append_path=None):
     transform_train = torchvision.transforms.Compose([torchvision.transforms.RandomChoice([torchvision.transforms.Resize(target_resolution), resize_and_crop]),
                                            transforms.RandomHorizontalFlip(),
                                            torchvision.transforms.RandomRotation((-15,15), resample=False, expand=False, center=None),
-                                           #torchvision.transforms.RandomVerticalFlip(),
                                            torchvision.transforms.ToTensor(),
                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
@@ -524,9 +523,9 @@ if torch.cuda.is_available():
     print("torch.cuda.get_device_name(0): {}".format(torch.cuda.get_device_name(0)))
 
 batch_size = 16 # Minibatch size
-num_epochs = 500
+num_epochs = 200
 learning_rate = 1e-4
-weight_decay = 1e-1
+weight_decay = 1e-3
 num_classes = 10
 number_of_different_splits = 3
 
